@@ -7,11 +7,11 @@ import { VscError } from "react-icons/vsc";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 
-// ✅ Mock user data
+// ✅ Mock user data (fixed: passwords as strings)
 const mockUsers = [
-  { id: 1001, password: 1234 },
-  { id: 1002, password: 5678 },
-  { id: 1003, password: 9999 },
+  { id: 1001, password: "a1234" },
+  { id: 1002, password: "b5678" },
+  { id: 1003, password: "c9999" },
 ];
 
 type Inputs = {
@@ -30,16 +30,16 @@ function SignIn() {
   } = useForm<Inputs>();
 
   const onSubmit: SubmitHandler<Inputs> = (data) => {
-    const idNumber = parseInt(data.enterId);
-    const passNumber = parseInt(data.password);
+    const idNumber = parseInt(data.enterId); // keep as number if your IDs are numeric
+    const password = data.password;
 
     const matchedUser = mockUsers.find(
-      (user) => user.id === idNumber && user.password === passNumber
+      (user) => user.id === idNumber && user.password === password
     );
 
     if (matchedUser) {
       toast.success("Login successful!");
-      router.push("/dashboard/projects"); // 🔁 Redirect
+      router.push("/dashboard/projects");
     } else {
       toast.error("Invalid ID or Password");
     }

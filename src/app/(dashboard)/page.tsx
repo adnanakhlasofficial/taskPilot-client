@@ -1,0 +1,459 @@
+"use client";
+
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import Link from "next/link";
+import {
+  ExternalLink,
+  Figma,
+  Search,
+  Star,
+  Calendar,
+  Users,
+  DollarSign,
+  MapPin,
+  Clock,
+  CheckCircle,
+  AlertCircle,
+  XCircle,
+} from "lucide-react";
+import { useState } from "react";
+
+interface Project {
+  id: number;
+  projectId: string;
+  station: string;
+  deadline: string;
+  value: string;
+  team: string;
+  uiUx: string;
+  frontend: string;
+  backend: string;
+  lastUpdate: string;
+  lastMeeting: string;
+  projectStatus: string;
+  esteemedDelivery: string;
+  clientStatus: string;
+  rating: string;
+  figma: string;
+  liveLink: string;
+  deliveryDate: string;
+  requirement: string;
+  note: string;
+}
+
+const ProjectTable = () => {
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const projectData: Project[] = [
+    {
+      id: 1,
+      projectId: "PRJ-001",
+      station: "Tokyo",
+      deadline: "2025-06-20",
+      value: "$12,000",
+      team: "Alpha Squad",
+      uiUx: "John Doe",
+      frontend: "Jane Smith",
+      backend: "Mark Johnson",
+      lastUpdate: "2025-06-12",
+      lastMeeting: "2025-06-10",
+      projectStatus: "In Progress",
+      esteemedDelivery: "2025-06-25",
+      clientStatus: "Awaiting Review",
+      rating: "4.5",
+      figma: "https://figma.com/example",
+      liveLink: "https://project-alpha.com",
+      deliveryDate: "2025-06-25",
+      requirement: "Integration with payment gateway",
+      note: "Ensure mobile responsiveness",
+    },
+    {
+      id: 2,
+      projectId: "PRJ-002",
+      station: "Berlin",
+      deadline: "2025-07-05",
+      value: "$15,000",
+      team: "Beta Crew",
+      uiUx: "Emily Davis",
+      frontend: "Robert Brown",
+      backend: "Sophia Wilson",
+      lastUpdate: "2025-06-13",
+      lastMeeting: "2025-06-11",
+      projectStatus: "Pending Kickoff",
+      esteemedDelivery: "2025-07-15",
+      clientStatus: "Requirements Finalized",
+      rating: "5.0",
+      figma: "https://figma.com/example",
+      liveLink: "https://project-beta.com",
+      deliveryDate: "2025-07-15",
+      requirement: "Admin dashboard setup",
+      note: "Optimize for performance",
+    },
+    {
+      id: 3,
+      projectId: "PRJ-003",
+      station: "New York",
+      deadline: "2025-06-30",
+      value: "$18,500",
+      team: "Gamma Force",
+      uiUx: "Michael Lee",
+      frontend: "Jessica Clark",
+      backend: "Daniel Martinez",
+      lastUpdate: "2025-06-14",
+      lastMeeting: "2025-06-12",
+      projectStatus: "Completed",
+      esteemedDelivery: "2025-06-28",
+      clientStatus: "Final Approval",
+      rating: "4.8",
+      figma: "https://figma.com/example",
+      liveLink: "https://project-gamma.com",
+      deliveryDate: "2025-06-28",
+      requirement: "Multi-language support",
+      note: "Client requested last-minute changes",
+    },
+    {
+      id: 4,
+      projectId: "PRJ-004",
+      station: "London",
+      deadline: "2025-08-15",
+      value: "$22,000",
+      team: "Delta Team",
+      uiUx: "Sarah Connor",
+      frontend: "Alex Turner",
+      backend: "Chris Evans",
+      lastUpdate: "2025-06-15",
+      lastMeeting: "2025-06-13",
+      projectStatus: "On Hold",
+      esteemedDelivery: "2025-08-20",
+      clientStatus: "Budget Approval",
+      rating: "4.2",
+      figma: "https://figma.com/example",
+      liveLink: "https://project-delta.com",
+      deliveryDate: "2025-08-20",
+      requirement: "E-commerce integration",
+      note: "Waiting for client feedback",
+    },
+  ];
+
+  const getStatusBadge = (status: string) => {
+    const statusConfig = {
+      Completed: {
+        variant: "default" as const,
+        icon: CheckCircle,
+        className: "bg-green-100 text-green-800 hover:bg-green-200",
+      },
+      "In Progress": {
+        variant: "secondary" as const,
+        icon: Clock,
+        className: "bg-blue-100 text-blue-800 hover:bg-blue-200",
+      },
+      "Pending Kickoff": {
+        variant: "outline" as const,
+        icon: AlertCircle,
+        className: "bg-yellow-100 text-yellow-800 hover:bg-yellow-200",
+      },
+      "On Hold": {
+        variant: "destructive" as const,
+        icon: XCircle,
+        className: "bg-red-100 text-red-800 hover:bg-red-200",
+      },
+    };
+
+    const config =
+      statusConfig[status as keyof typeof statusConfig] ||
+      statusConfig["Pending Kickoff"];
+    const Icon = config.icon;
+
+    return (
+      <Badge variant={config.variant} className={config.className}>
+        <Icon className="w-3 h-3 mr-1" />
+        {status}
+      </Badge>
+    );
+  };
+
+  const getClientStatusBadge = (status: string) => {
+    const statusConfig = {
+      "Final Approval": { className: "bg-green-100 text-green-800" },
+      "Awaiting Review": { className: "bg-orange-100 text-orange-800" },
+      "Requirements Finalized": { className: "bg-blue-100 text-blue-800" },
+      "Budget Approval": { className: "bg-purple-100 text-purple-800" },
+    };
+
+    const config = statusConfig[status as keyof typeof statusConfig] || {
+      className: "bg-gray-100 text-gray-800",
+    };
+
+    return (
+      <Badge variant="outline" className={config.className}>
+        {status}
+      </Badge>
+    );
+  };
+
+  const renderStars = (rating: string) => {
+    const numRating = Number.parseFloat(rating);
+    const fullStars = Math.floor(numRating);
+    const hasHalfStar = numRating % 1 !== 0;
+
+    return (
+      <div className="flex items-center gap-1">
+        {[...Array(5)].map((_, i) => (
+          <Star
+            key={i}
+            className={`w-4 h-4 ${
+              i < fullStars
+                ? "fill-yellow-400 text-yellow-400"
+                : i === fullStars && hasHalfStar
+                ? "fill-yellow-200 text-yellow-400"
+                : "text-gray-300"
+            }`}
+          />
+        ))}
+        <span className="text-sm font-medium ml-1">{rating}</span>
+      </div>
+    );
+  };
+
+  const filteredProjects = projectData.filter(
+    (project) =>
+      project.projectId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      project.team.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      project.station.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      project.projectStatus.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  return (
+    <div className="mx-auto p-6 space-y-6">
+      <Card>
+        <CardHeader>
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <CardTitle className="text-2xl font-bold">
+                Project Management Dashboard
+              </CardTitle>
+              <p className="text-muted-foreground mt-1">
+                Track and manage all your projects in one place
+              </p>
+            </div>
+            <div className="relative w-full sm:w-80">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Input
+                placeholder="Search projects, teams, or status..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="rounded-lg border overflow-hidden">
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-muted/50">
+                    <TableHead className="font-semibold">#</TableHead>
+                    <TableHead className="font-semibold">Project</TableHead>
+                    <TableHead className="font-semibold">
+                      <div className="flex items-center gap-1">
+                        <MapPin className="w-4 h-4" />
+                        Location
+                      </div>
+                    </TableHead>
+                    <TableHead className="font-semibold">
+                      <div className="flex items-center gap-1">
+                        <Calendar className="w-4 h-4" />
+                        Deadline
+                      </div>
+                    </TableHead>
+                    <TableHead className="font-semibold">
+                      <div className="flex items-center gap-1">
+                        <DollarSign className="w-4 h-4" />
+                        Value
+                      </div>
+                    </TableHead>
+                    <TableHead className="font-semibold">
+                      <div className="flex items-center gap-1">
+                        <Users className="w-4 h-4" />
+                        Team
+                      </div>
+                    </TableHead>
+                    <TableHead className="font-semibold">
+                      Team Members
+                    </TableHead>
+                    <TableHead className="font-semibold">Status</TableHead>
+                    <TableHead className="font-semibold">
+                      Client Status
+                    </TableHead>
+                    <TableHead className="font-semibold">Rating</TableHead>
+                    <TableHead className="font-semibold">Links</TableHead>
+                    <TableHead className="font-semibold">Details</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredProjects.map((project) => (
+                    <TableRow
+                      key={project.id}
+                      className="hover:bg-muted/30 transition-colors"
+                    >
+                      <TableCell className="font-medium">
+                        {project.id}
+                      </TableCell>
+                      <TableCell>
+                        <div className="space-y-1">
+                          <div className="font-semibold text-primary">
+                            {project.projectId}
+                          </div>
+                          <div className="text-sm text-muted-foreground">
+                            Delivery: {project.deliveryDate}
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="bg-slate-50">
+                          {project.station}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="space-y-1">
+                          <div className="font-medium">{project.deadline}</div>
+                          <div className="text-xs text-muted-foreground">
+                            Est: {project.esteemedDelivery}
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="font-semibold text-green-600">
+                          {project.value}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant="secondary"
+                          className="bg-indigo-100 text-indigo-800"
+                        >
+                          {project.team}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="space-y-1 text-sm">
+                          <div>
+                            <span className="font-medium">UI/UX:</span>{" "}
+                            {project.uiUx}
+                          </div>
+                          <div>
+                            <span className="font-medium">Frontend:</span>{" "}
+                            {project.frontend}
+                          </div>
+                          <div>
+                            <span className="font-medium">Backend:</span>{" "}
+                            {project.backend}
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        {getStatusBadge(project.projectStatus)}
+                      </TableCell>
+                      <TableCell>
+                        {getClientStatusBadge(project.clientStatus)}
+                      </TableCell>
+                      <TableCell>{renderStars(project.rating)}</TableCell>
+                      <TableCell>
+                        <div className="flex gap-2">
+                          <Button variant="outline" size="sm" asChild>
+                            <Link
+                              href={project.figma}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              <Figma className="w-4 h-4" />
+                            </Link>
+                          </Button>
+                          <Button variant="outline" size="sm" asChild>
+                            <Link
+                              href={project.liveLink}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              <ExternalLink className="w-4 h-4" />
+                            </Link>
+                          </Button>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="space-y-2 max-w-xs">
+                          <div className="text-sm">
+                            <span className="font-medium">Requirement:</span>
+                            <p className="text-muted-foreground mt-1">
+                              {project.requirement}
+                            </p>
+                          </div>
+                          <div className="text-sm">
+                            <span className="font-medium">Note:</span>
+                            <p className="text-muted-foreground mt-1">
+                              {project.note}
+                            </p>
+                          </div>
+                          <div className="text-xs text-muted-foreground space-y-1">
+                            <div>Last Update: {project.lastUpdate}</div>
+                            <div>Last Meeting: {project.lastMeeting}</div>
+                          </div>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
+
+          {filteredProjects.length === 0 && (
+            <div className="text-center py-12">
+              <div className="text-muted-foreground">
+                No projects found matching your search.
+              </div>
+            </div>
+          )}
+
+          <div className="flex justify-between items-center mt-4 text-sm text-muted-foreground">
+            <div>
+              Showing {filteredProjects.length} of {projectData.length} projects
+            </div>
+            <div className="flex gap-4">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-green-100 rounded-full"></div>
+                <span>Completed</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-blue-100 rounded-full"></div>
+                <span>In Progress</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-yellow-100 rounded-full"></div>
+                <span>Pending</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-red-100 rounded-full"></div>
+                <span>On Hold</span>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+export default ProjectTable;

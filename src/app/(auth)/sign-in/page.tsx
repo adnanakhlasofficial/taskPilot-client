@@ -5,21 +5,45 @@ import { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { VscError } from "react-icons/vsc";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
+
+// ✅ Mock user data (fixed: passwords as strings)
+const mockUsers = [
+  { id: 1001, password: "a1234" },
+  { id: 1002, password: "b5678" },
+  { id: 1003, password: "c9999" },
+];
 
 type Inputs = {
-  enterId: number;
-  password: number;
+  enterId: string;
+  password: string;
 };
 
 function SignIn() {
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const router = useRouter();
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<Inputs>();
 
-  const onSubmit: SubmitHandler<Inputs> = (data) => console.log(data);
+  const onSubmit: SubmitHandler<Inputs> = (data) => {
+    const idNumber = parseInt(data.enterId); // keep as number if your IDs are numeric
+    const password = data.password;
+
+    const matchedUser = mockUsers.find(
+      (user) => user.id === idNumber && user.password === password
+    );
+
+    if (matchedUser) {
+      toast.success("Login successful!");
+      router.push("/");
+    } else {
+      toast.error("Invalid ID or Password");
+    }
+  };
 
   return (
     <div className="lg:w-10/12 mx-auto lg:flex lg:flex-row-reverse h-screen gap-12 p-8 lg:px-12">

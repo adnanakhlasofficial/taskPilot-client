@@ -13,7 +13,7 @@
 // import { useAuth } from "@/contexts/auth-context"
 
 // export default function LoginForm() {
-//   const [email, setEmail] = useState("")
+//   const [userId, setuserId] = useState("")
 //   const [password, setPassword] = useState("")
 //   const [error, setError] = useState("")
 //   const { login, isLoading } = useAuth()
@@ -22,21 +22,21 @@
 //     e.preventDefault()
 //     setError("")
 
-//     const success = await login(email, password)
+//     const success = await login(userId, password)
 //     if (!success) {
-//       setError("Invalid email or password")
+//       setError("Invalid userId or password")
 //     }
 //   }
 
 //   const demoUsers = [
-//     { email: "admin@company.com", role: "admin", name: "John Doe" },
-//     { email: "co-leader@company.com", role: "co-leader", name: "Jane Smith" },
-//     { email: "member@company.com", role: "team-member", name: "Bob Wilson" },
-//     { email: "viewer@company.com", role: "viewer", name: "Alice Cooper" },
+//     { userId: "admin@company.com", role: "admin", name: "John Doe" },
+//     { userId: "co-leader@company.com", role: "co-leader", name: "Jane Smith" },
+//     { userId: "member@company.com", role: "team-member", name: "Bob Wilson" },
+//     { userId: "viewer@company.com", role: "viewer", name: "Alice Cooper" },
 //   ]
 
-//   const fillDemoUser = (userEmail: string) => {
-//     setEmail(userEmail)
+//   const fillDemoUser = (useruserId: string) => {
+//     setuserId(useruserId)
 //     setPassword("password")
 //   }
 
@@ -53,13 +53,13 @@
 //         <CardContent className="space-y-4">
 //           <form onSubmit={handleSubmit} className="space-y-4">
 //             <div className="space-y-2">
-//               <Label htmlFor="email">Email</Label>
+//               <Label htmlFor="userId">userId</Label>
 //               <Input
-//                 id="email"
-//                 type="email"
-//                 placeholder="Enter your email"
-//                 value={email}
-//                 onChange={(e) => setEmail(e.target.value)}
+//                 id="userId"
+//                 type="userId"
+//                 placeholder="Enter your userId"
+//                 value={userId}
+//                 onChange={(e) => setuserId(e.target.value)}
 //                 required
 //               />
 //             </div>
@@ -103,17 +103,17 @@
 //             <div className="grid gap-2">
 //               {demoUsers.map((user) => (
 //                 <Button
-//                   key={user.email}
+//                   key={user.userId}
 //                   variant="outline"
 //                   size="sm"
-//                   onClick={() => fillDemoUser(user.email)}
+//                   onClick={() => fillDemoUser(user.userId)}
 //                   className="justify-start text-left"
 //                 >
 //                   <div className="flex items-center gap-2 w-full">
 //                     <User className="h-4 w-4" />
 //                     <div className="flex-1">
 //                       <div className="font-medium">{user.name}</div>
-//                       <div className="text-xs text-muted-foreground">{user.email}</div>
+//                       <div className="text-xs text-muted-foreground">{user.userId}</div>
 //                     </div>
 //                     <Badge variant="secondary" className="capitalize text-xs">
 //                       {user.role.replace("-", " ")}
@@ -146,7 +146,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2, LogIn, User } from "lucide-react"
 
 export default function LoginForm() {
-  const [email, setemail] = useState("")
+  const [userId, setuserId] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
 
@@ -157,7 +157,7 @@ export default function LoginForm() {
     setError("")
 
     try {
-      const result = await login({ email, password }).unwrap()
+      const result = await login({ userId, password }).unwrap()
       console.log("Login success:", result)
     } catch (err: any) {
       console.error("Login failed:", err)
@@ -166,14 +166,14 @@ export default function LoginForm() {
   }
 
   // const demoUsers = [
-  //   { email: "admin@company.com", role: "admin", name: "John Doe" },
-  //   { email: "co-leader@company.com", role: "co-leader", name: "Jane Smith" },
-  //   { email: "member@company.com", role: "team-member", name: "Bob Wilson" },
-  //   { email: "viewer@company.com", role: "viewer", name: "Alice Cooper" },
+  //   { userId: "admin@company.com", role: "admin", name: "John Doe" },
+  //   { userId: "co-leader@company.com", role: "co-leader", name: "Jane Smith" },
+  //   { userId: "member@company.com", role: "team-member", name: "Bob Wilson" },
+  //   { userId: "viewer@company.com", role: "viewer", name: "Alice Cooper" },
   // ]
 
-  // const fillDemoUser = (email: string) => {
-  //   setemail(email)
+  // const fillDemoUser = (userId: string) => {
+  //   setuserId(userId)
   //   setPassword("password")
   // }
 
@@ -190,13 +190,13 @@ export default function LoginForm() {
         <CardContent className="space-y-4">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">email</Label>
+              <Label htmlFor="userId">userId</Label>
               <Input
-                id="email"
-                type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setemail(e.target.value)}
+                id="userId"
+                type="userId"
+                placeholder="Enter your userId"
+                value={userId}
+                onChange={(e) => setuserId(e.target.value)}
                 required
               />
             </div>
@@ -240,17 +240,17 @@ export default function LoginForm() {
             <div className="grid gap-2">
               {demoUsers.map((user) => (
                 <Button
-                  key={user.email}
+                  key={user.userId}
                   variant="outline"
                   size="sm"
-                  onClick={() => fillDemoUser(user.email)}
+                  onClick={() => fillDemoUser(user.userId)}
                   className="justify-start text-left"
                 >
                   <div className="flex items-center gap-2 w-full">
                     <User className="h-4 w-4" />
                     <div className="flex-1">
                       <div className="font-medium">{user.name}</div>
-                      <div className="text-xs text-muted-foreground">{user.email}</div>
+                      <div className="text-xs text-muted-foreground">{user.userId}</div>
                     </div>
                     <Badge variant="secondary" className="capitalize text-xs">
                       {user.role.replace("-", " ")}

@@ -1,12 +1,13 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 interface Credentials {
-  userId: string;
+  email: string;
   password: string;
 }
 export const loginSlice = createApi({
     reducerPath: "api",
     baseQuery: fetchBaseQuery({
-        baseUrl: "https://task-pilot-server2.vercel.app",
+        // baseUrl: "https://task-pilot-server2.vercel.app",
+        baseUrl: "https://code-commando.com",
     }),
     endpoints: (build) => ({
         login: build.mutation({

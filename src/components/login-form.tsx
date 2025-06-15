@@ -142,11 +142,11 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Badge } from "@/components/ui/badge"
+// import { Badge } from "@/components/ui/badge"
 import { Loader2, LogIn, User } from "lucide-react"
 
 export default function LoginForm() {
-  const [userId, setUserId] = useState("")
+  const [email, setemail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
 
@@ -157,7 +157,7 @@ export default function LoginForm() {
     setError("")
 
     try {
-      const result = await login({ userId, password }).unwrap()
+      const result = await login({ email, password }).unwrap()
       console.log("Login success:", result)
     } catch (err: any) {
       console.error("Login failed:", err)
@@ -166,14 +166,14 @@ export default function LoginForm() {
   }
 
   // const demoUsers = [
-  //   { userId: "admin@company.com", role: "admin", name: "John Doe" },
-  //   { userId: "co-leader@company.com", role: "co-leader", name: "Jane Smith" },
-  //   { userId: "member@company.com", role: "team-member", name: "Bob Wilson" },
-  //   { userId: "viewer@company.com", role: "viewer", name: "Alice Cooper" },
+  //   { email: "admin@company.com", role: "admin", name: "John Doe" },
+  //   { email: "co-leader@company.com", role: "co-leader", name: "Jane Smith" },
+  //   { email: "member@company.com", role: "team-member", name: "Bob Wilson" },
+  //   { email: "viewer@company.com", role: "viewer", name: "Alice Cooper" },
   // ]
 
-  const fillDemoUser = (userId: string) => {
-    setUserId(userId)
+  const fillDemoUser = (email: string) => {
+    setemail(email)
     setPassword("password")
   }
 
@@ -190,13 +190,13 @@ export default function LoginForm() {
         <CardContent className="space-y-4">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="userId">userId</Label>
+              <Label htmlFor="email">email</Label>
               <Input
-                id="userId"
-                type="userId"
-                placeholder="Enter your userId"
-                value={userId}
-                onChange={(e) => setUserId(e.target.value)}
+                id="email"
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setemail(e.target.value)}
                 required
               />
             </div>
@@ -240,17 +240,17 @@ export default function LoginForm() {
             <div className="grid gap-2">
               {demoUsers.map((user) => (
                 <Button
-                  key={user.userId}
+                  key={user.email}
                   variant="outline"
                   size="sm"
-                  onClick={() => fillDemoUser(user.userId)}
+                  onClick={() => fillDemoUser(user.email)}
                   className="justify-start text-left"
                 >
                   <div className="flex items-center gap-2 w-full">
                     <User className="h-4 w-4" />
                     <div className="flex-1">
                       <div className="font-medium">{user.name}</div>
-                      <div className="text-xs text-muted-foreground">{user.userId}</div>
+                      <div className="text-xs text-muted-foreground">{user.email}</div>
                     </div>
                     <Badge variant="secondary" className="capitalize text-xs">
                       {user.role.replace("-", " ")}

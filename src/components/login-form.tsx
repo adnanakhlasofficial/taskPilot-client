@@ -172,10 +172,10 @@ export default function LoginForm() {
   //   { email: "viewer@company.com", role: "viewer", name: "Alice Cooper" },
   // ]
 
-  const fillDemoUser = (email: string) => {
-    setemail(email)
-    setPassword("password")
-  }
+  // const fillDemoUser = (email: string) => {
+  //   setemail(email)
+  //   setPassword("password")
+  // }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-background p-4">

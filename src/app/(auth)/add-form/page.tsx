@@ -130,23 +130,6 @@ function SignIn() {
               </span>
             )}
           </div>
-          {/* project Price*/}
-          <div className="mb-6">
-            <label className="font-semibold">Project Price</label>
-            <br />
-            <input
-              type="number"
-              placeholder="Enter Project Price"
-              {...register("projectPrice", { required: "Project Id is required" })}
-              className="border p-2 rounded hover:border-blue-500 focus:border-blue-500 outline-none w-full"
-            />
-            {errors.projectName && (
-              <span className="text-red-500 mt-2 text-sm flex items-center gap-1">
-                <VscError />
-                {errors.projectName.message}
-              </span>
-            )}
-          </div>
           {/* Submit Button */}
           <input
             type="submit"

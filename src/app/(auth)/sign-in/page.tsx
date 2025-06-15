@@ -1,84 +1,3 @@
-// "use client"
-
-// import Image from "next/image";
-// import { useState } from "react";
-// import { useForm, SubmitHandler } from "react-hook-form"
-// import { FaEye, FaEyeSlash } from "react-icons/fa";
-// import { VscError } from "react-icons/vsc";
-
-// type Inputs = {
-//     enterId: number;
-//     password: number;
-// }
-
-// function SignIn() {
-//     const [showPassword, setShowPassword] = useState(false)
-//     const {
-//         register,
-//         handleSubmit,
-//         formState: { errors },
-//     } = useForm<Inputs>()
-
-//     const onSubmit: SubmitHandler<Inputs> = (data) => console.log(data)
-
-//     return (
-//         <div className="w-11/12 lg:w-1/2 mx-auto">
-//             <div className="text-center text-4xl">
-//                 <h1>Task Pilot Client</h1>
-//             </div>
-//             <div className="grid lg:grid-cols-2 justify-center items-center">
-//                 <div className="w-full">
-//                     <Image className="w-full h-[500px]" src={"/signinImg.png"} height={150} width={150} alt="signin image"></Image>
-//                 </div>
-//                 {/* <div className="p-4 max-w-sm mx-auto border rounded-sm"> */}
-//                 <form onSubmit={handleSubmit(onSubmit)}>
-
-//                     {/* Enter ID Field */}
-//                     <div className="w-full">
-//                         <label className="-mb-3 font-semibold">Enter Id</label><br />
-//                         <input
-//                             type="text"
-//                             placeholder="Enter your ID"
-//                             {...register("enterId", { required: "User ID is required" })}
-//                             className="border p-2 rounded hover:border-blue-500 focus:border-blue-500 outline-none w-full"
-//                         />
-//                         {errors.enterId && <span className="text-red-500 mt-2 text-sm flex items-center gap-1"><VscError />{errors.enterId.message}</span>}
-//                     </div>
-
-//                     {/* Password Field */}
-//                     <div className="relative">
-//                         <label className="-mb-3 font-semibold">Password</label> <br />
-//                         <input
-//                             type={showPassword ? "text" : "password"}
-//                             placeholder="Enter Your Password"
-//                             {...register("password", { required: "Password is required" })}
-//                             className="border p-2 rounded hover:border-blue-500 focus:border-blue-500 outline-none w-full"
-//                         />
-//                         <span
-//                             onClick={() => setShowPassword(!showPassword)}
-//                             className="btn btn-xs absolute right-2 top-9 text-blue-500"
-//                         >
-//                             {showPassword ? <FaEyeSlash /> : <FaEye />}
-//                         </span>
-//                         {errors.password && <span className="text-red-500 mt-2 text-sm flex items-center gap-1"><VscError />{errors.password.message}</span>}
-//                     </div>
-
-//                     {/* Submit Button */}
-//                     <input
-//                         type="submit"
-//                         value="Sign In"
-//                         className="bg-blue-500 text-white p-2 rounded cursor-pointer"
-//                     />
-//                 </form>
-//             </div>
-//         </div>
-//         // </div>
-//     )
-// }
-
-// export default SignIn
-
-
 "use client";
 
 import Image from "next/image";
@@ -93,7 +12,7 @@ type Inputs = {
 };
 
 function SignIn() {
-  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
   const {
     register,
     handleSubmit,
@@ -103,80 +22,73 @@ function SignIn() {
   const onSubmit: SubmitHandler<Inputs> = (data) => console.log(data);
 
   return (
-    <div className="min-h-screen flex flex-col items-center px-4 py-10">
-      {/* Title */}
-      <div className="text-center text-3xl md:text-4xl font-bold mb-8 text-blue-700">
-        <h1>Task Pilot Client</h1>
-      </div>
-
-      {/* Grid Container */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl w-full items-center">
-        {/* Image Section */}
-        <div className="w-full h-64 md:h-96 relative">
-          <Image
-            src="/signinImg.png"
-            alt="Sign In"
-            fill
-            className="object-cover rounded"
-          />
-        </div>
-
-        {/* Form Section */}
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="w-full space-y-5 bg-gray-100 p-6 md:p-8 rounded shadow"
-        >
-          {/* Enter ID */}
-          <div>
-            <label className="block font-semibold mb-1">Enter ID</label>
+    <div className="lg:w-10/12 mx-auto lg:flex lg:flex-row-reverse h-screen gap-12 p-8 lg:px-12">
+      <div className="lg:w-1/2 flex items-center justify-center">
+        <form onSubmit={handleSubmit(onSubmit)} className="w-full">
+          <h1 className="text-3xl font-bold mb-6 text-[#6C63FF]">
+            Task Pilot Client
+          </h1>
+          {/* Enter ID Field */}
+          <div className="mb-6">
+            <label className="font-semibold">Enter Id</label>
+            <br />
             <input
               type="text"
               placeholder="Enter your ID"
               {...register("enterId", { required: "User ID is required" })}
-              className="border p-2 rounded w-full hover:border-blue-500 focus:border-blue-500 outline-none"
+              className="border p-2 rounded hover:border-blue-500 focus:border-blue-500 outline-none w-full"
             />
             {errors.enterId && (
-              <span className="text-red-500 text-sm flex items-center gap-1 mt-1">
+              <span className="text-red-500 mt-2 text-sm flex items-center gap-1">
                 <VscError />
                 {errors.enterId.message}
               </span>
             )}
           </div>
 
-          {/* Password */}
+          {/* Password Field */}
           <div className="relative">
-            <label className="block font-semibold mb-1">Password</label>
+            <label className="font-semibold">Password</label> <br />
             <input
               type={showPassword ? "text" : "password"}
               placeholder="Enter Your Password"
               {...register("password", { required: "Password is required" })}
-              className="border p-2 pr-10 rounded w-full hover:border-blue-500 focus:border-blue-500 outline-none"
+              className="border p-2 rounded hover:border-blue-500 focus:border-blue-500 outline-none w-full"
             />
             <span
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute top-1/2 right-3 -translate-y-1/2 text-blue-500 cursor-pointer"
+              className="btn btn-xs absolute right-4 top-9 text-[#6C63FF]"
             >
               {showPassword ? <FaEyeSlash /> : <FaEye />}
             </span>
             {errors.password && (
-              <span className="text-red-500 text-sm flex items-center gap-1 mt-1">
+              <span className="text-red-500 mt-2 text-sm flex items-center gap-1">
                 <VscError />
                 {errors.password.message}
               </span>
             )}
           </div>
 
-          {/* Submit */}
+          {/* Submit Button */}
           <input
             type="submit"
             value="Sign In"
-            className="bg-blue-500 text-white w-full py-2 rounded hover:bg-blue-600 cursor-pointer transition duration-200"
+            className="bg-[#6C63FF] text-white p-2 rounded cursor-pointer w-full hover:bg-[#5a54e6] transition-colors duration-300 mt-6 mb-6 lg:mb-0"
           />
         </form>
+      </div>
+
+      <div className="lg:w-1/2 flex items-center justify-center">
+        <Image
+          src="/loginImg.svg"
+          width={150}
+          height={150}
+          alt="Login image"
+          className="w-full"
+        />
       </div>
     </div>
   );
 }
 
 export default SignIn;
-

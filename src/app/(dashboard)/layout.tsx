@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/sidebar";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useAuth } from "@/contexts/auth-context";
 import {
   Home,
   FolderKanban,
@@ -53,6 +54,7 @@ import {
   Clock,
   Target,
   TrendingUp,
+  Shield,
 } from "lucide-react";
 
 interface DashboardLayoutProps {
@@ -62,8 +64,9 @@ interface DashboardLayoutProps {
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const pathname = usePathname();
+  const { user, logout, hasRole } = useAuth();
 
-  // Navigation items
+  // Navigation items with role-based access
   const navigationItems = [
     {
       title: "Overview",
@@ -73,12 +76,14 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           icon: Home,
           url: "/dashboard",
           isActive: pathname === "/dashboard",
+          roles: ["admin", "co-leader", "team-member", "viewer"],
         },
         {
           title: "Analytics",
           icon: BarChart3,
           url: "/analytics",
           isActive: pathname === "/analytics",
+          roles: ["admin", "co-leader"],
         },
       ],
     },
@@ -90,18 +95,21 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           icon: FolderKanban,
           url: "/projects",
           isActive: pathname === "/projects",
+          roles: ["admin", "co-leader"],
         },
         {
           title: "My Tasks",
           icon: Target,
           url: "/tasks",
           isActive: pathname === "/tasks",
+          roles: ["admin", "co-leader", "team-member"],
         },
         {
           title: "Timeline",
           icon: Calendar,
           url: "/timeline",
           isActive: pathname === "/timeline",
+          roles: ["admin", "co-leader", "team-member"],
         },
       ],
     },
@@ -113,12 +121,14 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           icon: Users,
           url: "/team",
           isActive: pathname === "/team",
+          roles: ["admin", "co-leader"],
         },
         {
           title: "Performance",
           icon: TrendingUp,
           url: "/performance",
           isActive: pathname === "/performance",
+          roles: ["admin", "co-leader"],
         },
       ],
     },
@@ -130,12 +140,14 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           icon: Briefcase,
           url: "/clients",
           isActive: pathname === "/clients",
+          roles: ["admin", "co-leader"],
         },
         {
           title: "Time Tracking",
           icon: Clock,
           url: "/time-tracking",
           isActive: pathname === "/time-tracking",
+          roles: ["admin", "co-leader", "team-member"],
         },
       ],
     },
@@ -144,6 +156,33 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
   };
+
+  const handleLogout = () => {
+    logout();
+  };
+
+  const getRoleColor = (role: string) => {
+    switch (role) {
+      case "admin":
+        return "bg-red-100 text-red-800";
+      case "co-leader":
+        return "bg-blue-100 text-blue-800";
+      case "team-member":
+        return "bg-green-100 text-green-800";
+      case "viewer":
+        return "bg-gray-100 text-gray-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  // Filter navigation items based on user role
+  const filteredNavigationItems = navigationItems
+    .map((group) => ({
+      ...group,
+      items: group.items.filter((item) => !user || hasRole(item.roles as any)),
+    }))
+    .filter((group) => group.items.length > 0);
 
   return (
     <SidebarProvider>
@@ -166,7 +205,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             </SidebarHeader>
 
             <SidebarContent>
-              {navigationItems.map((group) => (
+              {filteredNavigationItems.map((group) => (
                 <SidebarGroup key={group.title}>
                   <SidebarGroupLabel>{group.title}</SidebarGroupLabel>
                   <SidebarGroupContent>
@@ -177,6 +216,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                             <Link href={item.url}>
                               <item.icon className="size-4" />
                               <span>{item.title}</span>
+                              {item.roles.includes("admin") &&
+                                item.roles.length <= 2 && (
+                                  <Shield className="ml-auto size-3 text-muted-foreground" />
+                                )}
                             </Link>
                           </SidebarMenuButton>
                         </SidebarMenuItem>
@@ -198,20 +241,36 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                       >
                         <Avatar className="h-8 w-8 rounded-lg">
                           <AvatarImage
-                            src="/placeholder.svg?height=32&width=32"
+                            src={
+                              user?.avatar ||
+                              "/placeholder.svg?height=32&width=32"
+                            }
                             alt="User"
                           />
                           <AvatarFallback className="rounded-lg">
-                            JD
+                            {user?.name
+                              ?.split(" ")
+                              .map((n) => n[0])
+                              .join("") || "U"}
                           </AvatarFallback>
                         </Avatar>
                         <div className="grid flex-1 text-left text-sm leading-tight">
                           <span className="truncate font-semibold">
-                            John Doe
+                            {user?.name || "User"}
                           </span>
-                          <span className="truncate text-xs text-muted-foreground">
-                            john@company.com
-                          </span>
+                          <div className="flex items-center gap-1">
+                            <span className="truncate text-xs text-muted-foreground">
+                              {user?.email}
+                            </span>
+                            {user && (
+                              <Badge
+                                variant="outline"
+                                className={`text-xs ${getRoleColor(user.role)}`}
+                              >
+                                {user.role.replace("-", " ")}
+                              </Badge>
+                            )}
+                          </div>
                         </div>
                         <ChevronDown className="ml-auto size-4" />
                       </SidebarMenuButton>
@@ -226,20 +285,38 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                         <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                           <Avatar className="h-8 w-8 rounded-lg">
                             <AvatarImage
-                              src="/placeholder.svg?height=32&width=32"
+                              src={
+                                user?.avatar ||
+                                "/placeholder.svg?height=32&width=32"
+                              }
                               alt="User"
                             />
                             <AvatarFallback className="rounded-lg">
-                              JD
+                              {user?.name
+                                ?.split(" ")
+                                .map((n) => n[0])
+                                .join("") || "U"}
                             </AvatarFallback>
                           </Avatar>
                           <div className="grid flex-1 text-left text-sm leading-tight">
                             <span className="truncate font-semibold">
-                              John Doe
+                              {user?.name || "User"}
                             </span>
-                            <span className="truncate text-xs text-muted-foreground">
-                              john@company.com
-                            </span>
+                            <div className="flex items-center gap-1">
+                              <span className="truncate text-xs text-muted-foreground">
+                                {user?.email}
+                              </span>
+                              {user && (
+                                <Badge
+                                  variant="outline"
+                                  className={`text-xs ${getRoleColor(
+                                    user.role
+                                  )}`}
+                                >
+                                  {user.role.replace("-", " ")}
+                                </Badge>
+                              )}
+                            </div>
                           </div>
                         </div>
                       </DropdownMenuLabel>
@@ -257,7 +334,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                         Help & Support
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem>
+                      <DropdownMenuItem onClick={handleLogout}>
                         <LogOut className="mr-2 h-4 w-4" />
                         Log out
                       </DropdownMenuItem>
@@ -287,10 +364,12 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
                   {/* Header Actions */}
                   <div className="flex items-center gap-2">
-                    <Button variant="outline" size="sm">
-                      <Plus className="h-4 w-4 mr-2" />
-                      New Project
-                    </Button>
+                    {hasRole(["admin", "co-leader"]) && (
+                      <Button variant="outline" size="sm">
+                        <Plus className="h-4 w-4 mr-2" />
+                        New Project
+                      </Button>
+                    )}
 
                     {/* Theme Toggle */}
                     <Button variant="ghost" size="sm" onClick={toggleDarkMode}>
@@ -370,10 +449,18 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                         >
                           <Avatar className="h-8 w-8">
                             <AvatarImage
-                              src="/placeholder.svg?height=32&width=32"
+                              src={
+                                user?.avatar ||
+                                "/placeholder.svg?height=32&width=32"
+                              }
                               alt="User"
                             />
-                            <AvatarFallback>JD</AvatarFallback>
+                            <AvatarFallback>
+                              {user?.name
+                                ?.split(" ")
+                                .map((n) => n[0])
+                                .join("") || "U"}
+                            </AvatarFallback>
                           </Avatar>
                         </Button>
                       </DropdownMenuTrigger>
@@ -385,11 +472,21 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                         <DropdownMenuLabel className="font-normal">
                           <div className="flex flex-col space-y-1">
                             <p className="text-sm font-medium leading-none">
-                              John Doe
+                              {user?.name || "User"}
                             </p>
                             <p className="text-xs leading-none text-muted-foreground">
-                              john@company.com
+                              {user?.email}
                             </p>
+                            {user && (
+                              <Badge
+                                variant="outline"
+                                className={`text-xs w-fit ${getRoleColor(
+                                  user.role
+                                )}`}
+                              >
+                                {user.role.replace("-", " ")}
+                              </Badge>
+                            )}
                           </div>
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator />
@@ -406,7 +503,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                           Help
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onClick={handleLogout}>
                           <LogOut className="mr-2 h-4 w-4" />
                           Log out
                         </DropdownMenuItem>
@@ -418,8 +515,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             </header>
 
             {/* Main Content Area */}
-            <main className="flex-1 overflow-auto">
-              <div className="mx-auto p-6">{children}</div>
+            <main className="container flex-1 overflow-auto p-6">
+              {children}
             </main>
           </SidebarInset>
         </div>

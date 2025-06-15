@@ -1,5 +1,8 @@
 import React from "react";
+import DashboardStat from "@/components/DashboardStat";
 
 export default function page() {
-  return <div>3 box</div>;
+  return <div>
+    <DashboardStat></DashboardStat>
+  </div>;
 }

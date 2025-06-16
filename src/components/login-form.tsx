@@ -61,7 +61,7 @@ export default function LoginForm() {
         <CardContent className="space-y-4">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="userId">userId</Label>
+              <Label htmlFor="userId">User Id</Label>
               <Input
                 id="userId"
                 type="userId"

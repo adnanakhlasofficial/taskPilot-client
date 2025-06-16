@@ -1,12 +1,8 @@
 "use client";
 
-import type React from "react";
-import { Suspense } from "react";
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,6 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 import {
   Sidebar,
   SidebarContent,
@@ -31,29 +28,30 @@ import {
   SidebarRail,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useAuth } from "@/contexts/auth-context";
 import {
-  Home,
-  FolderKanban,
-  Users,
-  Calendar,
   BarChart3,
-  Settings,
-  HelpCircle,
-  Bell,
-  Search,
-  Plus,
-  ChevronDown,
-  User,
-  LogOut,
-  Moon,
-  Sun,
   Briefcase,
+  Calendar,
+  ChevronDown,
   Clock,
+  FolderKanban,
+  HelpCircle,
+  Home,
+  LogOut,
+  Plus,
+  Search,
+  Settings,
+  Shield,
   Target,
   TrendingUp,
+  User,
+  Users
 } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import type React from "react";
+import { Suspense, useState } from "react";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -62,8 +60,9 @@ interface DashboardLayoutProps {
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const pathname = usePathname();
+  const { user, logout, hasRole } = useAuth();
 
-  // Navigation items
+  // Navigation items with role-based access
   const navigationItems = [
     {
       title: "Overview",
@@ -73,12 +72,14 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           icon: Home,
           url: "/dashboard",
           isActive: pathname === "/dashboard",
+          roles: ["admin", "co-leader", "team-member", "viewer"],
         },
         {
           title: "Analytics",
           icon: BarChart3,
           url: "/analytics",
           isActive: pathname === "/analytics",
+          roles: ["admin", "co-leader"],
         },
       ],
     },
@@ -90,18 +91,21 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           icon: FolderKanban,
           url: "/projects",
           isActive: pathname === "/projects",
+          roles: ["admin", "co-leader"],
         },
         {
           title: "My Tasks",
           icon: Target,
           url: "/tasks",
           isActive: pathname === "/tasks",
+          roles: ["admin", "co-leader", "team-member"],
         },
         {
           title: "Timeline",
           icon: Calendar,
           url: "/timeline",
           isActive: pathname === "/timeline",
+          roles: ["admin", "co-leader", "team-member"],
         },
       ],
     },
@@ -113,12 +117,14 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           icon: Users,
           url: "/team",
           isActive: pathname === "/team",
+          roles: ["admin", "co-leader"],
         },
         {
           title: "Performance",
           icon: TrendingUp,
           url: "/performance",
           isActive: pathname === "/performance",
+          roles: ["admin", "co-leader"],
         },
       ],
     },
@@ -130,12 +136,14 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           icon: Briefcase,
           url: "/clients",
           isActive: pathname === "/clients",
+          roles: ["admin", "co-leader"],
         },
         {
           title: "Time Tracking",
           icon: Clock,
           url: "/time-tracking",
           isActive: pathname === "/time-tracking",
+          roles: ["admin", "co-leader", "team-member"],
         },
       ],
     },
@@ -144,6 +152,33 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
   };
+
+  const handleLogout = () => {
+    logout();
+  };
+
+  const getRoleColor = (role: string) => {
+    switch (role) {
+      case "admin":
+        return "bg-red-100 text-red-800";
+      case "co-leader":
+        return "bg-blue-100 text-blue-800";
+      case "team-member":
+        return "bg-green-100 text-green-800";
+      case "viewer":
+        return "bg-gray-100 text-gray-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  // Filter navigation items based on user role
+  const filteredNavigationItems = navigationItems
+    .map((group) => ({
+      ...group,
+      items: group.items.filter((item) => !user || hasRole(item.roles as any)),
+    }))
+    .filter((group) => group.items.length > 0);
 
   return (
     <SidebarProvider>
@@ -166,7 +201,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             </SidebarHeader>
 
             <SidebarContent>
-              {navigationItems.map((group) => (
+              {filteredNavigationItems.map((group) => (
                 <SidebarGroup key={group.title}>
                   <SidebarGroupLabel>{group.title}</SidebarGroupLabel>
                   <SidebarGroupContent>
@@ -177,6 +212,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                             <Link href={item.url}>
                               <item.icon className="size-4" />
                               <span>{item.title}</span>
+                              {item.roles.includes("admin") &&
+                                item.roles.length <= 2 && (
+                                  <Shield className="ml-auto size-3 text-muted-foreground" />
+                                )}
                             </Link>
                           </SidebarMenuButton>
                         </SidebarMenuItem>
@@ -198,20 +237,36 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                       >
                         <Avatar className="h-8 w-8 rounded-lg">
                           <AvatarImage
-                            src="/placeholder.svg?height=32&width=32"
+                            src={
+                              user?.avatar ||
+                              "/placeholder.svg?height=32&width=32"
+                            }
                             alt="User"
                           />
                           <AvatarFallback className="rounded-lg">
-                            JD
+                            {user?.name
+                              ?.split(" ")
+                              .map((n) => n[0])
+                              .join("") || "U"}
                           </AvatarFallback>
                         </Avatar>
                         <div className="grid flex-1 text-left text-sm leading-tight">
                           <span className="truncate font-semibold">
-                            John Doe
+                            {user?.name || "User"}
                           </span>
-                          <span className="truncate text-xs text-muted-foreground">
-                            john@company.com
-                          </span>
+                          <div className="flex items-center gap-1">
+                            <span className="truncate text-xs text-muted-foreground">
+                              {user?.email}
+                            </span>
+                            {user && (
+                              <Badge
+                                variant="outline"
+                                className={`text-xs ${getRoleColor(user.role)}`}
+                              >
+                                {user.role.replace("-", " ")}
+                              </Badge>
+                            )}
+                          </div>
                         </div>
                         <ChevronDown className="ml-auto size-4" />
                       </SidebarMenuButton>
@@ -226,20 +281,38 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                         <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                           <Avatar className="h-8 w-8 rounded-lg">
                             <AvatarImage
-                              src="/placeholder.svg?height=32&width=32"
+                              src={
+                                user?.avatar ||
+                                "/placeholder.svg?height=32&width=32"
+                              }
                               alt="User"
                             />
                             <AvatarFallback className="rounded-lg">
-                              JD
+                              {user?.name
+                                ?.split(" ")
+                                .map((n) => n[0])
+                                .join("") || "U"}
                             </AvatarFallback>
                           </Avatar>
                           <div className="grid flex-1 text-left text-sm leading-tight">
                             <span className="truncate font-semibold">
-                              John Doe
+                              {user?.name || "User"}
                             </span>
-                            <span className="truncate text-xs text-muted-foreground">
-                              john@company.com
-                            </span>
+                            <div className="flex items-center gap-1">
+                              <span className="truncate text-xs text-muted-foreground">
+                                {user?.email}
+                              </span>
+                              {user && (
+                                <Badge
+                                  variant="outline"
+                                  className={`text-xs ${getRoleColor(
+                                    user.role
+                                  )}`}
+                                >
+                                  {user.role.replace("-", " ")}
+                                </Badge>
+                              )}
+                            </div>
                           </div>
                         </div>
                       </DropdownMenuLabel>
@@ -257,7 +330,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                         Help & Support
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem>
+                      <DropdownMenuItem onClick={handleLogout}>
                         <LogOut className="mr-2 h-4 w-4" />
                         Log out
                       </DropdownMenuItem>
@@ -287,139 +360,22 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
                   {/* Header Actions */}
                   <div className="flex items-center gap-2">
-                    <Button variant="outline" size="sm">
-                      <Plus className="h-4 w-4 mr-2" />
-                      New Project
-                    </Button>
+                    {hasRole(["admin", "co-leader"]) && (
+                      <Button variant="outline" size="sm">
+                        <Plus className="h-4 w-4 mr-2" />
+                        New Project
+                      </Button>
+                    )}
 
-                    {/* Theme Toggle */}
-                    <Button variant="ghost" size="sm" onClick={toggleDarkMode}>
-                      {isDarkMode ? (
-                        <Sun className="h-4 w-4" />
-                      ) : (
-                        <Moon className="h-4 w-4" />
-                      )}
-                    </Button>
-
-                    {/* Notifications */}
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm" className="relative">
-                          <Bell className="h-4 w-4" />
-                          <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 text-xs">
-                            3
-                          </Badge>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-80">
-                        <DropdownMenuLabel>Notifications</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <div className="space-y-2 p-2">
-                          <div className="flex items-start gap-3 rounded-lg p-2 hover:bg-muted">
-                            <div className="h-2 w-2 rounded-full bg-blue-500 mt-2"></div>
-                            <div className="flex-1 space-y-1">
-                              <p className="text-sm font-medium">
-                                New project assigned
-                              </p>
-                              <p className="text-xs text-muted-foreground">
-                                PRJ-005 has been assigned to your team
-                              </p>
-                              <p className="text-xs text-muted-foreground">
-                                2 minutes ago
-                              </p>
-                            </div>
-                          </div>
-                          <div className="flex items-start gap-3 rounded-lg p-2 hover:bg-muted">
-                            <div className="h-2 w-2 rounded-full bg-green-500 mt-2"></div>
-                            <div className="flex-1 space-y-1">
-                              <p className="text-sm font-medium">
-                                Task completed
-                              </p>
-                              <p className="text-xs text-muted-foreground">
-                                UI Design for PRJ-003 is ready for review
-                              </p>
-                              <p className="text-xs text-muted-foreground">
-                                1 hour ago
-                              </p>
-                            </div>
-                          </div>
-                          <div className="flex items-start gap-3 rounded-lg p-2 hover:bg-muted">
-                            <div className="h-2 w-2 rounded-full bg-orange-500 mt-2"></div>
-                            <div className="flex-1 space-y-1">
-                              <p className="text-sm font-medium">
-                                Deadline reminder
-                              </p>
-                              <p className="text-xs text-muted-foreground">
-                                PRJ-001 deadline is tomorrow
-                              </p>
-                              <p className="text-xs text-muted-foreground">
-                                3 hours ago
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-
-                    {/* User Menu */}
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          className="relative h-8 w-8 rounded-full"
-                        >
-                          <Avatar className="h-8 w-8">
-                            <AvatarImage
-                              src="/placeholder.svg?height=32&width=32"
-                              alt="User"
-                            />
-                            <AvatarFallback>JD</AvatarFallback>
-                          </Avatar>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent
-                        className="w-56"
-                        align="end"
-                        forceMount
-                      >
-                        <DropdownMenuLabel className="font-normal">
-                          <div className="flex flex-col space-y-1">
-                            <p className="text-sm font-medium leading-none">
-                              John Doe
-                            </p>
-                            <p className="text-xs leading-none text-muted-foreground">
-                              john@company.com
-                            </p>
-                          </div>
-                        </DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem>
-                          <User className="mr-2 h-4 w-4" />
-                          Profile
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Settings className="mr-2 h-4 w-4" />
-                          Settings
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <HelpCircle className="mr-2 h-4 w-4" />
-                          Help
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem>
-                          <LogOut className="mr-2 h-4 w-4" />
-                          Log out
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                    
                   </div>
                 </div>
               </div>
             </header>
 
             {/* Main Content Area */}
-            <main className="flex-1 overflow-auto">
-              <div className="mx-auto p-6">{children}</div>
+            <main className="container flex-1 overflow-auto p-6">
+              {children}
             </main>
           </SidebarInset>
         </div>

@@ -1,12 +1,8 @@
 "use client";
 
-import type React from "react";
-import { Suspense } from "react";
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,6 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 import {
   Sidebar,
   SidebarContent,
@@ -31,31 +28,30 @@ import {
   SidebarRail,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
 import {
-  Home,
-  FolderKanban,
-  Users,
-  Calendar,
   BarChart3,
-  Settings,
-  HelpCircle,
-  Bell,
-  Search,
-  Plus,
-  ChevronDown,
-  User,
-  LogOut,
-  Moon,
-  Sun,
   Briefcase,
+  Calendar,
+  ChevronDown,
   Clock,
+  FolderKanban,
+  HelpCircle,
+  Home,
+  LogOut,
+  Plus,
+  Search,
+  Settings,
+  Shield,
   Target,
   TrendingUp,
-  Shield,
+  User,
+  Users
 } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import type React from "react";
+import { Suspense, useState } from "react";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;

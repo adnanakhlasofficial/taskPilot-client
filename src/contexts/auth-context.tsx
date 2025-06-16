@@ -140,7 +140,7 @@ import {
   useUserCreateQuery,
 } from "@/features/loginSlice/loginSlice"
 
-export type UserRole = "admin" | "co-leader" | "team-member" | "viewer"
+export type UserRole = "admin" | "co-leader" | "member" | "viewer"
 
 export interface User {
  id: string;

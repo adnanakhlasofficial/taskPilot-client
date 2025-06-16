@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Table,
   TableBody,
@@ -23,98 +23,26 @@ import {
 import { Search, Users, Plus, Edit, Trash2, RefreshCw } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Skeleton } from "@/components/ui/skeleton";
-
-// TypeScript interfaces matching your API response
-interface User {
-  id: string;
-  userId: string;
-  userName: string;
-  email: string;
-  isActive: boolean;
-  password: string;
-  role: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface TeamMember {
-  id: string;
-  userId: string;
-  teamId: string;
-  createdAt: string;
-  updatedAt: string;
-  user: User;
-}
-
-interface Team {
-  id: string;
-  teamName: string;
-  createdAt: string;
-  updatedAt: string;
-  members: TeamMember[];
-}
-
-interface ApiResponse {
-  success: boolean;
-  message: string;
-  data: Team[];
-}
+import { useGetAllTeamQuery } from "@/features/loginSlice/loginSlice";
 
 const TeamManagementTable = () => {
-  // State management
-  const [teams, setTeams] = useState<Team[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  // RTK Query hook
+  const { 
+    data: teamsData, 
+    isLoading, 
+    error: fetchError,
+    refetch 
+  } = useGetAllTeamQuery();
+
+  // UI state
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTeam, setSelectedTeam] = useState<string | null>(null);
 
-  // Fetch teams from API
-  useEffect(() => {
-    const fetchTeams = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch("https://task-pilot-server2.vercel.app/api/v1/team");
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const data: ApiResponse = await response.json();
-        
-        if (data.success) {
-          setTeams(data.data);
-        } else {
-          setError(data.message || "Failed to fetch teams");
-        }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to fetch teams");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchTeams();
-  }, []);
-
-  // Refresh data function
-  const handleRefresh = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await fetch("https://task-pilot-server2.vercel.app/api/v1/team");
-      const data: ApiResponse = await response.json();
-      
-      if (data.success) {
-        setTeams(data.data);
-      } else {
-        setError(data.message || "Failed to refresh data");
-      }
-    } catch (err) {
-      setError("Failed to connect to the server");
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Derived state
+  const teams = teamsData?.data || [];
+  const error = fetchError ? 
+    (fetchError as any)?.data?.message || "Failed to fetch teams" : 
+    null;
 
   // Filter teams based on search term
   const filteredTeams = teams.filter(team => {
@@ -146,7 +74,7 @@ const TeamManagementTable = () => {
   };
 
   // Loading state
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="space-y-4 p-6">
         <div className="flex items-center justify-between">
@@ -166,7 +94,7 @@ const TeamManagementTable = () => {
       <Card className="m-6">
         <CardContent className="p-6 text-center">
           <div className="text-red-500 mb-4">{error}</div>
-          <Button onClick={handleRefresh}>
+          <Button onClick={() => refetch()}>
             <RefreshCw className="w-4 h-4 mr-2" />
             Retry
           </Button>
@@ -204,10 +132,10 @@ const TeamManagementTable = () => {
                 <Plus className="w-4 h-4 mr-2" />
                 Add New Team
               </Button>
-              <Button variant="outline" onClick={handleRefresh}>
+              {/* <Button variant="outline" onClick={() => refetch()}>
                 <RefreshCw className="w-4 h-4 mr-2" />
                 Refresh Data
-              </Button>
+              </Button> */}
               <div className="relative w-full sm:w-80">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <Input
@@ -298,9 +226,9 @@ const TeamManagementTable = () => {
                                         <Badge variant={member.user.isActive ? "default" : "secondary"}>
                                           {member.user.isActive ? "Active" : "Inactive"}
                                         </Badge>
-                                        <Badge variant="outline">
+                                        {/* <Badge variant="outline">
                                           {member.user.role}
-                                        </Badge>
+                                        </Badge> */}
                                       </div>
                                     </div>
                                   </TooltipContent>

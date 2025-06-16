@@ -1,22 +1,29 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Shield, ArrowLeft, Lock, Users } from "lucide-react"
-import Link from "next/link"
-import { useAuth } from "@/contexts/auth-context"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Shield, ArrowLeft, Lock, Users } from "lucide-react";
+import Link from "next/link";
+import { useAuth } from "@/hooks/useAuth";
+import type { UserRole } from "@/types/auth";
 
 interface AccessDeniedProps {
-  requiredRoles?: string[]
-  message?: string
+  requiredRoles?: UserRole[];
+  message?: string;
 }
 
 export default function AccessDenied({
-  requiredRoles = ["admin", "co-leader"],
+  requiredRoles = ["admin", "leader"],
   message = "You don't have permission to access this page.",
 }: AccessDeniedProps) {
-  const { user } = useAuth()
+  const { user } = useAuth();
 
   return (
     <div className="flex items-center justify-center min-h-[60vh]">
@@ -25,19 +32,23 @@ export default function AccessDenied({
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
             <Shield className="h-8 w-8 text-red-600" />
           </div>
-          <CardTitle className="text-xl font-semibold text-red-600">Access Denied</CardTitle>
+          <CardTitle className="text-xl font-semibold text-red-600">
+            Access Denied
+          </CardTitle>
           <CardDescription className="text-center">{message}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="text-center space-y-2">
             <div className="flex items-center justify-center gap-2">
               <Lock className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">Required Roles:</span>
+              <span className="text-sm text-muted-foreground">
+                Required Roles:
+              </span>
             </div>
             <div className="flex justify-center gap-2">
               {requiredRoles.map((role) => (
                 <Badge key={role} variant="outline" className="capitalize">
-                  {role.replace("-", " ")}
+                  {role}
                 </Badge>
               ))}
             </div>
@@ -47,10 +58,12 @@ export default function AccessDenied({
             <div className="text-center space-y-2">
               <div className="flex items-center justify-center gap-2">
                 <Users className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">Your Role:</span>
+                <span className="text-sm text-muted-foreground">
+                  Your Role:
+                </span>
               </div>
               <Badge variant="secondary" className="capitalize">
-                {user.role.replace("-", " ")}
+                {user.role}
               </Badge>
             </div>
           )}
@@ -69,5 +82,5 @@ export default function AccessDenied({
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

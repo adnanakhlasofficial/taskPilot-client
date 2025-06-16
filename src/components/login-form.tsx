@@ -1,40 +1,43 @@
+"use client";
 
-"use client"
+import { useLoginMutation } from "@/features/loginSlice/loginSlice";
+import { useState } from "react";
 
-import { useState } from "react"
-import { useLoginMutation } from "@/features/loginSlice/loginSlice"
-
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
 import {
-  Card, CardContent, CardDescription, CardHeader, CardTitle
-} from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Alert, AlertDescription } from "@/components/ui/alert"
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 // import { Badge } from "@/components/ui/badge"
-import { Loader2, LogIn, User } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { Loader2, LogIn } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function LoginForm() {
-  const [userId, setuserId] = useState("")
-  const [password, setPassword] = useState("")
-  const [error, setError] = useState("")
-  const [login, { isLoading }] = useLoginMutation()
-  const router = useRouter()
+  const [userId, setuserId] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [login, { isLoading }] = useLoginMutation();
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
+    e.preventDefault();
+    setError("");
 
     try {
-      const result = await login({ userId, password }).unwrap()
-      console.log("Login success:", result)
-      router.push("/dashboard")
-    } catch (err: any) {
-      console.error("Login failed:", err)
-      setError("Invalid User Id or password")
+      const result = await login({ userId, password }).unwrap();
+      console.log("Login success:", result);
+      router.push("/dashboard");
+    } catch (err: unknown) {
+      console.error("Login failed:", err);
+      setError("Invalid User Id or password");
     }
-  }
+  };
 
   // const demoUsers = [
   //   { userId: "admin@company.com", role: "admin", name: "John Doe" },
@@ -134,6 +137,5 @@ export default function LoginForm() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
-

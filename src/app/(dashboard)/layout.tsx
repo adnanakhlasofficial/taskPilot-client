@@ -28,7 +28,7 @@ import {
   SidebarRail,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { useAuth } from "@/contexts/auth-context";
+import { useAuth, UserRole } from "@/contexts/auth-context";
 import {
   BarChart3,
   Briefcase,
@@ -46,19 +46,18 @@ import {
   Target,
   TrendingUp,
   User,
-  Users
+  Users,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type React from "react";
-import { Suspense, useState } from "react";
+import { Suspense } from "react";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
 }
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
-  const [isDarkMode, setIsDarkMode] = useState(false);
   const pathname = usePathname();
   const { user, logout, hasRole } = useAuth();
 
@@ -149,10 +148,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     },
   ];
 
-  const toggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode);
-  };
-
   const handleLogout = () => {
     logout();
   };
@@ -176,7 +171,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const filteredNavigationItems = navigationItems
     .map((group) => ({
       ...group,
-      items: group.items.filter((item) => !user || hasRole(item.roles as any)),
+      items: group.items.filter(
+        (item) => !user || hasRole(item.roles as UserRole[])
+      ),
     }))
     .filter((group) => group.items.length > 0);
 
@@ -366,8 +363,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                         New Project
                       </Button>
                     )}
-
-                    
                   </div>
                 </div>
               </div>

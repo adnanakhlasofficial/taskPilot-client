@@ -171,19 +171,24 @@ export default function BonusMembersTable() {
                       <div className="flex items-center gap-2">
                         <span>{m.amountToBePaid}</span>
 
-                        <Button
-                          onClick={async () => {
-                            const numericAmount = parseInt(
-                              m.amountToBePaid.replace(/[^\d]/g, ""),
-                              10
-                            );
-                            await checkoutCredits(numericAmount);
-                          }}
-                        >
-                          Pay Now
-                        </Button>
+                        {/* 👉 show button only if the amount is > 0 */}
+                        {parseInt(m.amountToBePaid.replace(/[^\d]/g, ""), 10) >
+                          0 && (
+                          <Button
+                            onClick={async () => {
+                              const numericAmount = parseInt(
+                                m.amountToBePaid.replace(/[^\d]/g, ""),
+                                10
+                              );
+                              await checkoutCredits(numericAmount);
+                            }}
+                          >
+                            Pay Now
+                          </Button>
+                        )}
                       </div>
                     </TableCell>
+
                     <TableCell>{m.lastPaidAmount}</TableCell>
                   </TableRow>
                 ))}

@@ -1,5 +1,5 @@
 "use client";
-
+import { checkoutCredits } from "../../lib/actions/checkout";
 import { useState } from "react";
 import {
   Table,
@@ -51,7 +51,7 @@ const members: Member[] = [
     phone: "01987654321",
     address: "456 Park Ave",
     Role: "Co-Leader",
-    amountToBePaid: "৳3,000",
+    amountToBePaid: "৳0.00",
     lastPaidAmount: "৳3,000",
   },
   {
@@ -172,9 +172,13 @@ export default function BonusMembersTable() {
                         <span>{m.amountToBePaid}</span>
 
                         <Button
-                          onClick={() =>
-                            alert(`Initiating payment for ${m.name}`)
-                          }
+                          onClick={async () => {
+                            const numericAmount = parseInt(
+                              m.amountToBePaid.replace(/[^\d]/g, ""),
+                              10
+                            );
+                            await checkoutCredits(numericAmount);
+                          }}
                         >
                           Pay Now
                         </Button>

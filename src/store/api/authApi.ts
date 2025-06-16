@@ -37,9 +37,17 @@ export const authApi = createApi({
         throw new Error(response.message || "Login failed");
       },
       transformErrorResponse: (response) => {
+        let message = "Login failed";
+        if (
+          response.data &&
+          typeof response.data === "object" &&
+          "message" in response.data
+        ) {
+          message = (response.data as { message?: string }).message || message;
+        }
         return {
           status: response.status,
-          message: response.data?.message || "Login failed",
+          message,
         };
       },
     }),

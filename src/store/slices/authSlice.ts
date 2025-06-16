@@ -1,4 +1,4 @@
-import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import { AnyAction, createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import { authApi } from "../api/authApi";
 import { AuthState, User } from "@/types/auth";
 
@@ -85,7 +85,7 @@ const authSlice = createSlice({
       })
       .addMatcher(
         authApi.endpoints.login.matchRejected,
-        (state, action: any) => {
+        (state, action: AnyAction) => {
           state.isLoading = false;
           state.error =
             action.payload?.message || action.error?.message || "Login failed";

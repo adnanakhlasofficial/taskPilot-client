@@ -34,7 +34,7 @@ export default function LoginForm() {
     if (localError) {
       setLocalError("");
     }
-  }, [userId, password, clearError]);
+  }, [userId, password, clearError, error, localError]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,7 +55,9 @@ export default function LoginForm() {
     const result = await login(credentials);
 
     if (!result.success) {
-      setLocalError(result.error);
+      setLocalError(
+        typeof result.error === "string" ? result.error : "Unknown error"
+      );
     }
   };
 

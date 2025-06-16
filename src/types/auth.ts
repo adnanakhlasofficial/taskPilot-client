@@ -21,7 +21,7 @@ export interface LoginResponse {
   };
 }
 
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = object> {
   success: boolean;
   message: string;
   data?: T;

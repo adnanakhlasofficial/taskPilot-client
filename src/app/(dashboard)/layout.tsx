@@ -28,7 +28,8 @@ import {
   SidebarRail,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { useAuth, UserRole } from "@/contexts/auth-context";
+import { useAuth } from "@/contexts/auth-context";
+import { UserRole } from "@/types/auth";
 import {
   BarChart3,
   Briefcase,

@@ -1,80 +1,86 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useRef, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Badge } from "@/components/ui/badge"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
-  Send,
-  Paperclip,
-  Smile,
-  MoreVertical,
-  Phone,
-  Video,
-  Users,
-  Pin,
-  Star,
-  Reply,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
   Edit,
-  Trash2,
   Hash,
   Lock,
-} from "lucide-react"
+  MoreVertical,
+  Paperclip,
+  Phone,
+  Pin,
+  Reply,
+  Send,
+  Smile,
+  Star,
+  Trash2,
+  Users,
+  Video,
+} from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 interface Message {
-  id: string
-  userId: string
-  userName: string
-  userAvatar?: string
-  content: string
-  timestamp: string
-  isEdited?: boolean
+  id: string;
+  userId: string;
+  userName: string;
+  userAvatar?: string;
+  content: string;
+  timestamp: string;
+  isEdited?: boolean;
   attachments?: Array<{
-    id: string
-    name: string
-    type: string
-    url: string
-  }>
+    id: string;
+    name: string;
+    type: string;
+    url: string;
+  }>;
   reactions?: Array<{
-    emoji: string
-    count: number
-    users: string[]
-  }>
+    emoji: string;
+    count: number;
+    users: string[];
+  }>;
   replyTo?: {
-    id: string
-    userName: string
-    content: string
-  }
+    id: string;
+    userName: string;
+    content: string;
+  };
 }
 
 interface ChatWindowProps {
-  channelId: string
-  channelName: string
-  channelType: "channel" | "dm" | "group"
-  isPrivate?: boolean
-  members?: number
+  channelId: string;
+  channelName: string;
+  channelType: "channel" | "dm" | "group";
+  isPrivate?: boolean;
+  members?: number;
 }
 
 export default function ChatWindow({
-  channelId,
+  // channelId,
   channelName,
   channelType,
   isPrivate = false,
   members = 0,
 }: ChatWindowProps) {
-  const [message, setMessage] = useState("")
+  const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
       userId: "john",
       userName: "John Doe",
       userAvatar: "/placeholder.svg?height=32&width=32",
-      content: "Hey team! I've just pushed the latest updates to the repository. Please review when you get a chance.",
+      content:
+        "Hey team! I've just pushed the latest updates to the repository. Please review when you get a chance.",
       timestamp: "10:30 AM",
       reactions: [
         { emoji: "👍", count: 3, users: ["jane", "bob", "alice"] },
@@ -86,7 +92,8 @@ export default function ChatWindow({
       userId: "jane",
       userName: "Jane Smith",
       userAvatar: "/placeholder.svg?height=32&width=32",
-      content: "Thanks John! I'll take a look at it this afternoon. The UI components look great so far.",
+      content:
+        "Thanks John! I'll take a look at it this afternoon. The UI components look great so far.",
       timestamp: "10:35 AM",
       replyTo: {
         id: "1",
@@ -99,7 +106,8 @@ export default function ChatWindow({
       userId: "bob",
       userName: "Bob Wilson",
       userAvatar: "/placeholder.svg?height=32&width=32",
-      content: "I've completed the backend API testing. All endpoints are working correctly. Here's the test report:",
+      content:
+        "I've completed the backend API testing. All endpoints are working correctly. Here's the test report:",
       timestamp: "11:15 AM",
       attachments: [
         {
@@ -120,17 +128,17 @@ export default function ChatWindow({
       timestamp: "11:45 AM",
       isEdited: true,
     },
-  ])
+  ]);
 
-  const scrollAreaRef = useRef<HTMLDivElement>(null)
-  const inputRef = useRef<HTMLInputElement>(null)
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     // Scroll to bottom when new messages arrive
     if (scrollAreaRef.current) {
-      scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight
+      scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
     }
-  }, [messages])
+  }, [messages]);
 
   const handleSendMessage = () => {
     if (message.trim()) {
@@ -139,46 +147,63 @@ export default function ChatWindow({
         userId: "current-user",
         userName: "You",
         content: message,
-        timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-      }
-      setMessages([...messages, newMessage])
-      setMessage("")
+        timestamp: new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+      };
+      setMessages([...messages, newMessage]);
+      setMessage("");
     }
-  }
+  };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault()
-      handleSendMessage()
+      e.preventDefault();
+      handleSendMessage();
     }
-  }
+  };
 
   const addReaction = (messageId: string, emoji: string) => {
     setMessages(
       messages.map((msg) => {
         if (msg.id === messageId) {
-          const existingReaction = msg.reactions?.find((r) => r.emoji === emoji)
+          const existingReaction = msg.reactions?.find(
+            (r) => r.emoji === emoji
+          );
           if (existingReaction) {
             return {
               ...msg,
               reactions: msg.reactions?.map((r) =>
-                r.emoji === emoji ? { ...r, count: r.count + 1, users: [...r.users, "current-user"] } : r,
+                r.emoji === emoji
+                  ? {
+                      ...r,
+                      count: r.count + 1,
+                      users: [...r.users, "current-user"],
+                    }
+                  : r
               ),
-            }
+            };
           } else {
             return {
               ...msg,
-              reactions: [...(msg.reactions || []), { emoji, count: 1, users: ["current-user"] }],
-            }
+              reactions: [
+                ...(msg.reactions || []),
+                { emoji, count: 1, users: ["current-user"] },
+              ],
+            };
           }
         }
-        return msg
-      }),
-    )
-  }
+        return msg;
+      })
+    );
+  };
 
   const renderMessage = (msg: Message) => (
-    <div key={msg.id} className="group flex gap-3 p-3 hover:bg-muted/30 transition-colors">
+    <div
+      key={msg.id}
+      className="group flex gap-3 p-3 hover:bg-muted/30 transition-colors"
+    >
       <Avatar className="w-8 h-8 mt-1">
         <AvatarImage src={msg.userAvatar || "/placeholder.svg"} />
         <AvatarFallback className="text-xs">
@@ -202,8 +227,12 @@ export default function ChatWindow({
 
         {msg.replyTo && (
           <div className="mb-2 p-2 border-l-2 border-muted bg-muted/20 rounded text-sm">
-            <div className="font-medium text-xs text-muted-foreground mb-1">Replying to {msg.replyTo.userName}</div>
-            <div className="text-muted-foreground truncate">{msg.replyTo.content}</div>
+            <div className="font-medium text-xs text-muted-foreground mb-1">
+              Replying to {msg.replyTo.userName}
+            </div>
+            <div className="text-muted-foreground truncate">
+              {msg.replyTo.content}
+            </div>
           </div>
         )}
 
@@ -212,7 +241,10 @@ export default function ChatWindow({
         {msg.attachments && msg.attachments.length > 0 && (
           <div className="space-y-2 mb-2">
             {msg.attachments.map((attachment) => (
-              <div key={attachment.id} className="flex items-center gap-2 p-2 border rounded-lg bg-muted/20 w-fit">
+              <div
+                key={attachment.id}
+                className="flex items-center gap-2 p-2 border rounded-lg bg-muted/20 w-fit"
+              >
                 <Paperclip className="w-4 h-4 text-muted-foreground" />
                 <span className="text-sm font-medium">{attachment.name}</span>
                 <Button variant="ghost" size="sm" className="h-6 px-2">
@@ -279,7 +311,7 @@ export default function ChatWindow({
         </DropdownMenu>
       </div>
     </div>
-  )
+  );
 
   return (
     <div className="flex flex-col h-full">
@@ -375,7 +407,9 @@ export default function ChatWindow({
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder={`Message ${channelType === "channel" ? "#" + channelName : channelName}...`}
+              placeholder={`Message ${
+                channelType === "channel" ? "#" + channelName : channelName
+              }...`}
               className="pr-20"
             />
             <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-1">
@@ -391,8 +425,10 @@ export default function ChatWindow({
             <Send className="w-4 h-4" />
           </Button>
         </div>
-        <div className="text-xs text-muted-foreground mt-2">Press Enter to send, Shift + Enter for new line</div>
+        <div className="text-xs text-muted-foreground mt-2">
+          Press Enter to send, Shift + Enter for new line
+        </div>
       </div>
     </div>
-  )
+  );
 }

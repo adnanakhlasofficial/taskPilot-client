@@ -79,6 +79,11 @@ interface Message {
   status?: "sending" | "sent" | "delivered" | "read";
   type?: "text" | "system" | "file" | "image";
 }
+declare global {
+  interface Window {
+    webkitAudioContext?: typeof AudioContext;
+  }
+}
 
 interface ChatWindowFullProps {
   channelId: string;
@@ -100,7 +105,8 @@ export default function ChatWindowFull({
   onNewMessage,
 }: ChatWindowFullProps) {
   const [message, setMessage] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
+  // const [isTyping, setIsTyping] = useState(false);
+  const isTyping = false; // Placeholder for typing indicator, can be replaced with actual logic
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [replyingTo, setReplyingTo] = useState<Message | null>(null);
   const [messages, setMessages] = useState<Message[]>(
@@ -220,7 +226,7 @@ export default function ChatWindowFull({
   const playNotificationSound = () => {
     // Create a simple notification sound
     const audioContext = new (window.AudioContext ||
-      (window as any).webkitAudioContext)();
+      (window as typeof window).webkitAudioContext)();
     const oscillator = audioContext.createOscillator();
     const gainNode = audioContext.createGain();
 
@@ -306,7 +312,7 @@ export default function ChatWindowFull({
       try {
         playNotificationSound();
       } catch (error) {
-        console.log("Could not play notification sound");
+        console.log(error, "Could not play notification sound");
       }
     }
   };

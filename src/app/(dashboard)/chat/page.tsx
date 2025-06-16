@@ -9,7 +9,15 @@ export default function ChatPage() {
   const [activeChannel, setActiveChannel] = useState("general");
 
   const getChannelInfo = (channelId: string) => {
-    const channelMap: Record<string, object> = {
+    const channelMap: Record<
+      string,
+      {
+        name: string;
+        type: "channel" | "dm" | "group";
+        isPrivate?: boolean;
+        members?: number;
+      }
+    > = {
       general: { name: "general", type: "channel", members: 12 },
       "prj-001": {
         name: "prj-001-alpha",
@@ -40,7 +48,7 @@ export default function ChatPage() {
   const channelInfo = getChannelInfo(activeChannel);
 
   return (
-    <RoleGuard allowedRoles={["admin", "co-leader", "team-member"]}>
+    <RoleGuard allowedRoles={["admin", "leader", "member"]}>
       <div className="h-[calc(100vh-8rem)] flex bg-background border rounded-lg overflow-hidden shadow-sm">
         <ChatSidebarFull
           activeChannel={activeChannel}

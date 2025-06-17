@@ -1,10 +1,8 @@
 "use client";
 
-import { useLoginMutation } from "@/features/loginSlice/loginSlice";
-import { useState } from "react";
+import type React from "react";
 
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
+import { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -12,44 +10,63 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-// import { Badge } from "@/components/ui/badge"
-import { Loader2, LogIn } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Loader2, LogIn, Eye, EyeOff, User } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import type { LoginCredentials } from "@/types/auth";
 
 export default function LoginForm() {
-  const [userId, setuserId] = useState("");
+  const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [login, { isLoading }] = useLoginMutation();
-  const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
+  const [localError, setLocalError] = useState("");
+
+  const { login, isLoading, error, clearError } = useAuth();
+
+  // Clear errors when component mounts or inputs change
+  useEffect(() => {
+    if (error) {
+      clearError();
+    }
+    if (localError) {
+      setLocalError("");
+    }
+  }, [userId, password, clearError, error, localError]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
+    setLocalError("");
 
-    try {
-      const result = await login({ userId, password }).unwrap();
-      console.log("Login success:", result);
-      router.push("/dashboard");
-    } catch (err: unknown) {
-      console.error("Login failed:", err);
-      setError("Invalid User Id or password");
+    // Basic validation
+    if (!userId || !password) {
+      setLocalError("Please fill in all fields");
+      return;
+    }
+
+    if (userId.length < 3) {
+      setLocalError("User ID must be at least 3 characters");
+      return;
+    }
+
+    const credentials: LoginCredentials = { userId, password };
+    const result = await login(credentials);
+
+    if (!result.success) {
+      setLocalError(
+        typeof result.error === "string" ? result.error : "Unknown error"
+      );
     }
   };
 
-  // const demoUsers = [
-  //   { userId: "admin@company.com", role: "admin", name: "John Doe" },
-  //   { userId: "co-leader@company.com", role: "co-leader", name: "Jane Smith" },
-  //   { userId: "member@company.com", role: "team-member", name: "Bob Wilson" },
-  //   { userId: "viewer@company.com", role: "viewer", name: "Alice Cooper" },
-  // ]
+  const fillDemoUser = (demoUserId: string, demoPassword: string) => {
+    setUserId(demoUserId);
+    setPassword(demoPassword);
+  };
 
-  // const fillDemoUser = (userId: string) => {
-  //   setuserId(userId)
-  //   setPassword("password")
-  // }
+  const displayError = localError || error;
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-background p-4">
@@ -59,36 +76,62 @@ export default function LoginForm() {
             <LogIn className="h-6 w-6" />
           </div>
           <CardTitle className="text-2xl font-bold">Welcome Back</CardTitle>
-          <CardDescription>Sign in to access ProjectHub</CardDescription>
+          <CardDescription>Sign in to access TaskPilot</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="userId">User Id</Label>
-              <Input
-                id="userId"
-                type="userId"
-                placeholder="Enter your userId"
-                value={userId}
-                onChange={(e) => setuserId(e.target.value)}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
+              <Label htmlFor="userId">User ID</Label>
+              <div className="relative">
+                <Input
+                  id="userId"
+                  type="text"
+                  placeholder="Enter your user ID"
+                  value={userId}
+                  onChange={(e) => setUserId(e.target.value)}
+                  disabled={isLoading}
+                  required
+                  autoComplete="username"
+                  className="pl-10"
+                />
+                <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              </div>
             </div>
 
-            {error && (
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={isLoading}
+                  required
+                  autoComplete="current-password"
+                  className="pr-10"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                  onClick={() => setShowPassword(!showPassword)}
+                  disabled={isLoading}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4 text-muted-foreground" />
+                  ) : (
+                    <Eye className="h-4 w-4 text-muted-foreground" />
+                  )}
+                </Button>
+              </div>
+            </div>
+
+            {displayError && (
               <Alert variant="destructive">
-                <AlertDescription>{error}</AlertDescription>
+                <AlertDescription>{displayError}</AlertDescription>
               </Alert>
             )}
 
@@ -107,33 +150,75 @@ export default function LoginForm() {
             </Button>
           </form>
 
-          {/* <div className="space-y-3">
-            <div className="text-center">
-              <p className="text-sm text-muted-foreground">Demo Users (Password: "password")</p>
-            </div>
-            <div className="grid gap-2">
-              {demoUsers.map((user) => (
+          {/* Development Helper */}
+          {process.env.NODE_ENV === "development" && (
+            <div className="space-y-3 pt-4 border-t">
+              <div className="text-center">
+                <p className="text-sm text-muted-foreground">
+                  Development Mode - Demo Users
+                </p>
+              </div>
+              <div className="grid gap-2">
                 <Button
-                  key={user.userId}
                   variant="outline"
                   size="sm"
-                  onClick={() => fillDemoUser(user.userId)}
+                  onClick={() => fillDemoUser("A001", "123456")}
+                  disabled={isLoading}
                   className="justify-start text-left"
                 >
                   <div className="flex items-center gap-2 w-full">
-                    <User className="h-4 w-4" />
                     <div className="flex-1">
-                      <div className="font-medium">{user.name}</div>
-                      <div className="text-xs text-muted-foreground">{user.userId}</div>
+                      <div className="font-medium">Admin User</div>
+                      <div className="text-xs text-muted-foreground">
+                        User ID: A001
+                      </div>
                     </div>
-                    <Badge variant="secondary" className="capitalize text-xs">
-                      {user.role.replace("-", " ")}
-                    </Badge>
+                    <div className="text-xs bg-red-100 text-red-800 px-2 py-1 rounded">
+                      Admin
+                    </div>
                   </div>
                 </Button>
-              ))}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => fillDemoUser("L001", "123456")}
+                  disabled={isLoading}
+                  className="justify-start text-left"
+                >
+                  <div className="flex items-center gap-2 w-full">
+                    <div className="flex-1">
+                      <div className="font-medium">Leader User</div>
+                      <div className="text-xs text-muted-foreground">
+                        User ID: L001
+                      </div>
+                    </div>
+                    <div className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                      Leader
+                    </div>
+                  </div>
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => fillDemoUser("M001", "123456")}
+                  disabled={isLoading}
+                  className="justify-start text-left"
+                >
+                  <div className="flex items-center gap-2 w-full">
+                    <div className="flex-1">
+                      <div className="font-medium">Member User</div>
+                      <div className="text-xs text-muted-foreground">
+                        User ID: M001
+                      </div>
+                    </div>
+                    <div className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
+                      Member
+                    </div>
+                  </div>
+                </Button>
+              </div>
             </div>
-          </div> */}
+          )}
         </CardContent>
       </Card>
     </div>

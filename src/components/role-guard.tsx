@@ -1,18 +1,23 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useAuth, type UserRole } from "@/contexts/auth-context"
-import AccessDenied from "./access-denied"
-import LoginForm from "./login-form"
+import { useAuth } from "@/hooks/useAuth";
+import AccessDenied from "./access-denied";
+import LoginForm from "./login-form";
+import type { UserRole } from "@/types/auth";
+import type { ReactNode } from "react";
 
 interface RoleGuardProps {
-  children: React.ReactNode
-  allowedRoles: UserRole[]
-  fallback?: React.ReactNode
+  children: ReactNode;
+  allowedRoles: UserRole[];
+  fallback?: ReactNode;
 }
 
-export default function RoleGuard({ children, allowedRoles, fallback }: RoleGuardProps) {
-  const { user, hasRole, isLoading } = useAuth()
+export default function RoleGuard({
+  children,
+  allowedRoles,
+  fallback,
+}: RoleGuardProps) {
+  const { user, hasRole, isLoading, isAuthenticated } = useAuth();
 
   if (isLoading) {
     return (
@@ -22,16 +27,16 @@ export default function RoleGuard({ children, allowedRoles, fallback }: RoleGuar
           <p className="text-sm text-muted-foreground">Loading...</p>
         </div>
       </div>
-    )
+    );
   }
 
-  if (!user) {
-    return <LoginForm />
+  if (!isAuthenticated || !user) {
+    return <LoginForm />;
   }
 
   if (!hasRole(allowedRoles)) {
-    return fallback || <AccessDenied requiredRoles={allowedRoles} />
+    return fallback || <AccessDenied requiredRoles={allowedRoles} />;
   }
 
-  return <>{children}</>
+  return <>{children}</>;
 }

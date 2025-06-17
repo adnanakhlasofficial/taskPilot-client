@@ -1,0 +1,31 @@
+{
+  "members": [
+    {
+      "id": 1,
+      "name": "John Doe",
+      "phone": "01234567890",
+      "address": "123 Main St",
+      "role": "Leader",
+      "amountToBePaid": 5000,
+      "lastPaidAmount": 2000
+    },
+    {
+      "id": 2,
+      "name": "Jane Smith",
+      "phone": "01987654321",
+      "address": "456 Park Ave",
+      "role": "Co‑Leader",
+      "amountToBePaid": 0,
+      "lastPaidAmount": 3000
+    },
+    {
+      "id": 3,
+      "name": "Rahim Sheikh",
+      "phone": "01678896658",
+      "address": "Las Vegas",
+      "role": "Viewer",
+      "amountToBePaid": 100,
+      "lastPaidAmount": 3000
+    }
+  ]
+}

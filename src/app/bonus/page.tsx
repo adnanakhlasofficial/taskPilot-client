@@ -1,5 +1,4 @@
 "use client";
-import { checkoutCredits } from "../../lib/actions/checkout";
 import { useState } from "react";
 import {
   Table,
@@ -10,7 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button"; // ✅ Import Button
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Search,
@@ -26,51 +25,86 @@ import {
  * Member record shape
  */
 interface Member {
+  id: string;
   name: string;
   phone: string;
   address: string;
   Role: string;
-  amountToBePaid: string;
-  lastPaidAmount: string;
+  amountToBePaid: number;
+  lastPaidAmount: number;
 }
 
 /**
- * Sample data
+ * Sample data (with numbers instead of strings for amountToBePaid)
  */
 const members: Member[] = [
   {
+    id: "684e96daa777acbafecf5206",
     name: "John Doe",
     phone: "01234567890",
     address: "123 Main St",
     Role: "Leader",
-    amountToBePaid: "৳5,000",
-    lastPaidAmount: "৳2,000",
+    amountToBePaid: 5000,
+    lastPaidAmount: 2000,
   },
   {
+    id: "684e96daa777acbafecf5207",
     name: "Jane Smith",
     phone: "01987654321",
     address: "456 Park Ave",
     Role: "Co-Leader",
-    amountToBePaid: "৳0.00",
-    lastPaidAmount: "৳3,000",
+    amountToBePaid: 0,
+    lastPaidAmount: 3000,
   },
   {
+    id: "684e96daa777acbafecf5208",
     name: "Shoeb Akhter",
     phone: "0152365855",
     address: "Las Vegas",
     Role: "Team Member",
-    amountToBePaid: "৳3,000",
-    lastPaidAmount: "৳3,000",
+    amountToBePaid: 3000,
+    lastPaidAmount: 3000,
   },
   {
+    id: "684e96daa777acbafecf5209",
     name: "Nasir Uddin",
     phone: "01687745569",
     address: "Lahore, Pakistan",
     Role: "Viewer",
-    amountToBePaid: "৳3,000",
-    lastPaidAmount: "৳3,000",
+    amountToBePaid: 100,
+    lastPaidAmount: 3000,
   },
 ];
+
+/**
+ * Helper to handle payment
+ */
+const handlePayNow = async (userId: string, amount: number) => {
+  try {
+    const res = await fetch(
+      "https://task-pilot-server2.vercel.app/api/v1/payment/create-checkout-session",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          productName: "Bonus Payment",
+          amount,
+          userId,
+        }),
+      }
+    );
+
+    const data = await res.json();
+    if (data.success && data.data?.url) {
+      window.location.href = data.data.url;
+    } else {
+      alert(data.message || "Payment failed.");
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Something went wrong while creating the checkout session.");
+  }
+};
 
 export default function BonusMembersTable() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -82,7 +116,6 @@ export default function BonusMembersTable() {
       m.phone.toLowerCase().includes(q) ||
       m.address.toLowerCase().includes(q) ||
       m.Role.toLowerCase().includes(q) ||
-      m.amountToBePaid.toLowerCase().includes(q) ||
       m.lastPaidAmount.toLowerCase().includes(q)
     );
   });
@@ -160,7 +193,7 @@ export default function BonusMembersTable() {
               <TableBody>
                 {filteredMembers.map((m) => (
                   <TableRow
-                    key={m.phone}
+                    key={m.id}
                     className="transition-colors hover:bg-muted/30"
                   >
                     <TableCell>{m.name}</TableCell>
@@ -169,26 +202,22 @@ export default function BonusMembersTable() {
                     <TableCell>{m.Role}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <span>{m.amountToBePaid}</span>
+                        <span>
+                          {new Intl.NumberFormat("en-BD", {
+                            style: "currency",
+                            currency: "BDT",
+                          }).format(m.amountToBePaid)}
+                        </span>
 
-                        {/* 👉 show button only if the amount is > 0 */}
-                        {parseInt(m.amountToBePaid.replace(/[^\d]/g, ""), 10) >
-                          0 && (
+                        {m.amountToBePaid > 0 && (
                           <Button
-                            onClick={async () => {
-                              const numericAmount = parseInt(
-                                m.amountToBePaid.replace(/[^\d]/g, ""),
-                                10
-                              );
-                              await checkoutCredits(numericAmount);
-                            }}
+                            onClick={() => handlePayNow(m.id, m.amountToBePaid)}
                           >
-                            Pay Now
+                            Pay Now
                           </Button>
                         )}
                       </div>
                     </TableCell>
-
                     <TableCell>{m.lastPaidAmount}</TableCell>
                   </TableRow>
                 ))}

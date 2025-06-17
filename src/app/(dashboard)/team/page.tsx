@@ -24,6 +24,54 @@ import { Search, Users, Plus, Edit, Trash2, RefreshCw } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGetAllTeamQuery } from "@/features/loginSlice/loginSlice";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { useForm } from "react-hook-form";
+
+interface User {
+  id: string;
+  userId: string;
+  userName: string;
+  email: string;
+  isActive: boolean;
+  password: string;
+  role: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface TeamMember {
+  id: string;
+  userId: string;
+  teamId: string;
+  createdAt: string;
+  updatedAt: string;
+  user: User;
+}
+
+interface Team {
+  id: string;
+  teamName: string;
+  createdAt: string;
+  updatedAt: string;
+  members: TeamMember[];
+}
+
+interface ApiResponse {
+  success: boolean;
+  message: string;
+  data: Team[];
+}
+
+interface TeamFormValues {
+  teamName: string;
+  // Add other fields as needed
+}
 
 const TeamManagementTable = () => {
   // RTK Query hook
@@ -37,6 +85,17 @@ const TeamManagementTable = () => {
   // UI state
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTeam, setSelectedTeam] = useState<string | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [currentTeam, setCurrentTeam] = useState<Team | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Form handling
+  const { 
+    register, 
+    handleSubmit, 
+    reset,
+    formState: { errors } 
+  } = useForm<TeamFormValues>();
 
   // Derived state
   const teams = teamsData?.data || [];
@@ -59,6 +118,32 @@ const TeamManagementTable = () => {
   // Handle team selection
   const handleTeamSelect = (id: string) => {
     setSelectedTeam(selectedTeam === id ? null : id);
+  };
+
+  // Handle edit button click
+  const handleEditClick = (team: Team) => {
+    setCurrentTeam(team);
+    reset({
+      teamName: team.teamName,
+      // Set other default values here
+    });
+    setIsEditModalOpen(true);
+  };
+
+  // Handle form submission
+  const onSubmit = async (data: TeamFormValues) => {
+    setIsSubmitting(true);
+    try {
+      console.log("Form data:", data);
+      // Add your update logic here
+      // Typically you would dispatch an update action
+      // await updateTeam({ id: currentTeam?.id, ...data });
+      setIsEditModalOpen(false);
+    } catch (err) {
+      console.error("Failed to update team:", err);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Format date for display
@@ -105,6 +190,42 @@ const TeamManagementTable = () => {
 
   return (
     <div className="w-full space-y-6 p-6">
+      {/* Edit Team Modal */}
+      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Team</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <div>
+              <Label htmlFor="teamName">Team Name</Label>
+              <Input
+                id="teamName"
+                {...register("teamName", { required: "Team name is required" })}
+              />
+              {errors.teamName && (
+                <p className="text-sm text-red-500">{errors.teamName.message}</p>
+              )}
+            </div>
+            
+            {/* Add other form fields as needed */}
+            
+            <div className="flex justify-end gap-2">
+              <Button 
+                variant="outline" 
+                type="button"
+                onClick={() => setIsEditModalOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? "Saving..." : "Save Changes"}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
       <Card>
         <CardHeader>
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -132,10 +253,6 @@ const TeamManagementTable = () => {
                 <Plus className="w-4 h-4 mr-2" />
                 Add New Team
               </Button>
-              {/* <Button variant="outline" onClick={() => refetch()}>
-                <RefreshCw className="w-4 h-4 mr-2" />
-                Refresh Data
-              </Button> */}
               <div className="relative w-full sm:w-80">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <Input
@@ -226,9 +343,6 @@ const TeamManagementTable = () => {
                                         <Badge variant={member.user.isActive ? "default" : "secondary"}>
                                           {member.user.isActive ? "Active" : "Inactive"}
                                         </Badge>
-                                        {/* <Badge variant="outline">
-                                          {member.user.role}
-                                        </Badge> */}
                                       </div>
                                     </div>
                                   </TooltipContent>
@@ -249,7 +363,11 @@ const TeamManagementTable = () => {
                         </TableCell>
                         <TableCell>
                           <div className="flex gap-2">
-                            <Button variant="outline" size="sm">
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => handleEditClick(team)}
+                            >
                               <Edit className="w-4 h-4 mr-2" />
                               Edit
                             </Button>

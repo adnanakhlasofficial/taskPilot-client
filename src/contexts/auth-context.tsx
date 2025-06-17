@@ -2,7 +2,22 @@
 
 import { createContext, useContext, useState, useEffect } from "react";
 
-const AuthContext = createContext(undefined);
+interface AuthContextType {
+  user: UserType | null;
+  login: (email: string, password: string) => Promise<void>;
+  // ...other fields
+}
+
+export const AuthContext = createContext<AuthContextType | undefined>(
+  undefined
+);
+interface UserType {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  avatar: string;
+}
 
 // Mock users for demonstration
 const mockUsers = [
@@ -36,8 +51,8 @@ const mockUsers = [
   },
 ];
 
-export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<UserType | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -54,7 +69,7 @@ export function AuthProvider({ children }) {
     setIsLoading(false);
   }, []);
 
-  const login = async (email, password) => {
+  const login = async (email: string, password: string) => {
     setIsLoading(true);
 
     // Simulate API call delay
@@ -65,7 +80,7 @@ export function AuthProvider({ children }) {
 
     if (foundUser && password === "password") {
       // Simple mock password
-      setUser(foundUser);
+      setUser(foundUser as UserType);
       localStorage.setItem("user", JSON.stringify(foundUser));
       setIsLoading(false);
       return true;
@@ -80,12 +95,12 @@ export function AuthProvider({ children }) {
     localStorage.removeItem("user");
   };
 
-  const hasRole = (roles) => {
+  const hasRole = (roles: string) => {
     if (!user) return false;
     return roles.includes(user.role);
   };
 
-  const value = {
+  const auth = {
     user,
     login,
     logout,
@@ -93,7 +108,7 @@ export function AuthProvider({ children }) {
     isLoading,
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {

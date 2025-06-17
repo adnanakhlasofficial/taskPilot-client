@@ -567,7 +567,7 @@ const ProjectTable = () => {
   });
 
   return (
-    <div className="w-[calc(100%-var(--sidebar-width))] space-y-6">
+    <div className="container mx-auto space-y-6">
       <Card>
         <CardHeader>
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">

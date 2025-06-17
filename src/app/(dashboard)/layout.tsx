@@ -365,9 +365,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             </header>
 
             {/* Main Content Area */}
-            <main className="container mx-auto flex-1 overflow-auto p-6">
-              {children}
-            </main>
+            <main className="flex-1 overflow-auto p-6">{children}</main>
           </SidebarInset>
         </div>
       </Suspense>

@@ -154,7 +154,7 @@ export default function LoginForm() {
           </form>
 
           {/* Development Helper */}
-          {process.env.NODE_ENV === "development" && (
+          {process.env.NODE_ENV === "production" && (
             <div className="space-y-3 pt-4 border-t">
               <div className="text-center">
                 <p className="text-sm text-muted-foreground">

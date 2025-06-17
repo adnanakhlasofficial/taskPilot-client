@@ -5,6 +5,7 @@ import "./globals.css";
 import { AuthProvider } from "@/contexts/auth-context";
 import StoreProvider from "./StoreProvider";
 import { ReduxProvider } from "@/providers/redux-provider";
+import { Toaster } from "@/components/ui/sonner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -26,6 +27,7 @@ export default function RootLayout({
             <AuthProvider>{children}</AuthProvider>
           </ReduxProvider>
         </StoreProvider>
+        <Toaster />
       </body>
     </html>
   );

@@ -35,6 +35,7 @@ import {
   Briefcase,
   Calendar,
   ChevronDown,
+  CircleUserRound,
   Clock,
   FolderKanban,
   HelpCircle,
@@ -234,15 +235,13 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                         className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                       >
                         <Avatar className="h-8 w-8 rounded-lg">
-                          <AvatarImage
-                            src={
-                              user?.avatar ||
-                              "/placeholder.svg?height=32&width=32"
-                            }
-                            alt="User"
-                          />
+                          {user?.avatar ? (
+                            <AvatarImage src={user.avatar} alt="User Avatar" />
+                          ) : (
+                            <CircleUserRound />
+                          )}
                           <AvatarFallback className="rounded-lg">
-                            {user?.name
+                            {user?.userName
                               ?.split(" ")
                               .map((n) => n[0])
                               .join("") || "U"}
@@ -250,7 +249,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                         </Avatar>
                         <div className="grid flex-1 text-left text-sm leading-tight">
                           <span className="truncate font-semibold">
-                            {user?.name || "User"}
+                            {user?.userName || "User"}
                           </span>
                           <div className="flex items-center gap-1">
                             <span className="truncate text-xs text-muted-foreground">
@@ -286,7 +285,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                               alt="User"
                             />
                             <AvatarFallback className="rounded-lg">
-                              {user?.name
+                              {user?.userName
                                 ?.split(" ")
                                 .map((n) => n[0])
                                 .join("") || "U"}
@@ -294,7 +293,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                           </Avatar>
                           <div className="grid flex-1 text-left text-sm leading-tight">
                             <span className="truncate font-semibold">
-                              {user?.name || "User"}
+                              {user?.userName || "User"}
                             </span>
                             <div className="flex items-center gap-1">
                               <span className="truncate text-xs text-muted-foreground">
@@ -370,7 +369,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             </header>
 
             {/* Main Content Area */}
-            <main className="container flex-1 overflow-auto p-6">
+            <main className="container mx-auto flex-1 overflow-auto p-6">
               {children}
             </main>
           </SidebarInset>

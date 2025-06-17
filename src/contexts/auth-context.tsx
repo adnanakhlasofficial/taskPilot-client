@@ -13,7 +13,7 @@ export const AuthContext = createContext<AuthContextType | undefined>(
 );
 interface UserType {
   id: string;
-  name: string;
+  userName: string;
   email: string;
   role: string;
   avatar: string;

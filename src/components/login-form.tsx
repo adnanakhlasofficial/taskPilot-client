@@ -55,7 +55,7 @@ export default function LoginForm() {
     const result = await login(credentials);
     if (result.success) {
       // Redirect to home page on successful login
-      redirect("/dashboard");
+      redirect("/home");
     } else {
       // Handle error from login
       setLocalError(
@@ -152,9 +152,8 @@ export default function LoginForm() {
               )}
             </Button>
           </form>
-
           {/* Development Helper */}
-          {process.env.NODE_ENV === "production" && (
+          {process.env.NODE_ENV === "development" && (
             <div className="space-y-3 pt-4 border-t">
               <div className="text-center">
                 <p className="text-sm text-muted-foreground">
@@ -165,7 +164,7 @@ export default function LoginForm() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => fillDemoUser("U001", "123456")}
+                  onClick={() => fillDemoUser("U0001", "123456")}
                   disabled={isLoading}
                   className="justify-start text-left"
                 >
@@ -173,7 +172,7 @@ export default function LoginForm() {
                     <div className="flex-1">
                       <div className="font-medium">Admin User</div>
                       <div className="text-xs text-muted-foreground">
-                        User ID: U001
+                        User ID: U0001
                       </div>
                     </div>
                     <div className="text-xs bg-red-100 text-red-800 px-2 py-1 rounded">
@@ -184,7 +183,7 @@ export default function LoginForm() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => fillDemoUser("U002", "123456")}
+                  onClick={() => fillDemoUser("U0002", "123456")}
                   disabled={isLoading}
                   className="justify-start text-left"
                 >
@@ -192,7 +191,7 @@ export default function LoginForm() {
                     <div className="flex-1">
                       <div className="font-medium">Leader User</div>
                       <div className="text-xs text-muted-foreground">
-                        User ID: U002
+                        User ID: U0002
                       </div>
                     </div>
                     <div className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
@@ -203,7 +202,7 @@ export default function LoginForm() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => fillDemoUser("U003", "123456")}
+                  onClick={() => fillDemoUser("U0003", "123456")}
                   disabled={isLoading}
                   className="justify-start text-left"
                 >
@@ -211,7 +210,7 @@ export default function LoginForm() {
                     <div className="flex-1">
                       <div className="font-medium">Member User</div>
                       <div className="text-xs text-muted-foreground">
-                        User ID: U003
+                        User ID: U0003
                       </div>
                     </div>
                     <div className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">

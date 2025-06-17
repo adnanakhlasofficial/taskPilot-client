@@ -18,6 +18,8 @@ import {
 } from "@/store/api/authApi";
 import { useEffect } from "react";
 import type { LoginCredentials, UserRole } from "@/types/auth";
+import { redirect } from "next/navigation";
+import { useRouter } from "next/router";
 
 export function useAuth() {
   const dispatch = useDispatch();

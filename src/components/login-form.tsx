@@ -2,7 +2,8 @@
 
 import type React from "react";
 
-import { useState, useEffect } from "react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -10,20 +11,19 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, LogIn, Eye, EyeOff, User } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import type { LoginCredentials } from "@/types/auth";
+import { Eye, EyeOff, Loader2, LogIn, User } from "lucide-react";
+import { redirect } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function LoginForm() {
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [localError, setLocalError] = useState("");
-
   const { login, isLoading, error, clearError } = useAuth();
 
   // Clear errors when component mounts or inputs change
@@ -53,10 +53,13 @@ export default function LoginForm() {
 
     const credentials: LoginCredentials = { userId, password };
     const result = await login(credentials);
-
-    if (!result.success) {
+    if (result.success) {
+      // Redirect to home page on successful login
+      redirect("/dashboard");
+    } else {
+      // Handle error from login
       setLocalError(
-        typeof result.error === "string" ? result.error : "Unknown error"
+        typeof result.error === "string" ? result.error : "Login failed"
       );
     }
   };
@@ -162,7 +165,7 @@ export default function LoginForm() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => fillDemoUser("A001", "123456")}
+                  onClick={() => fillDemoUser("U001", "123456")}
                   disabled={isLoading}
                   className="justify-start text-left"
                 >
@@ -170,7 +173,7 @@ export default function LoginForm() {
                     <div className="flex-1">
                       <div className="font-medium">Admin User</div>
                       <div className="text-xs text-muted-foreground">
-                        User ID: A001
+                        User ID: U001
                       </div>
                     </div>
                     <div className="text-xs bg-red-100 text-red-800 px-2 py-1 rounded">
@@ -181,7 +184,7 @@ export default function LoginForm() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => fillDemoUser("L001", "123456")}
+                  onClick={() => fillDemoUser("U002", "123456")}
                   disabled={isLoading}
                   className="justify-start text-left"
                 >
@@ -189,7 +192,7 @@ export default function LoginForm() {
                     <div className="flex-1">
                       <div className="font-medium">Leader User</div>
                       <div className="text-xs text-muted-foreground">
-                        User ID: L001
+                        User ID: U002
                       </div>
                     </div>
                     <div className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
@@ -200,7 +203,7 @@ export default function LoginForm() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => fillDemoUser("M001", "123456")}
+                  onClick={() => fillDemoUser("U003", "123456")}
                   disabled={isLoading}
                   className="justify-start text-left"
                 >
@@ -208,7 +211,7 @@ export default function LoginForm() {
                     <div className="flex-1">
                       <div className="font-medium">Member User</div>
                       <div className="text-xs text-muted-foreground">
-                        User ID: M001
+                        User ID: U003
                       </div>
                     </div>
                     <div className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">

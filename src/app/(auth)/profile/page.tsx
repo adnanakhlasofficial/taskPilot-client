@@ -49,7 +49,7 @@ export default function ProfilePage() {
         {/* --- Profile Info --- */}
         <CardContent className="space-y-4 px-6 pb-6">
           <div className="text-center -mt-6">
-            <span className="font-semibold capitalize bg-black text-white text-sm px-3 rounded-sm">{user.role}</span>
+            <span className="font-semibold capitalize bg-green-300 text- text-sm px-3 rounded-sm">{user.role}</span>
           </div>
 
           <div className="space-y-1">

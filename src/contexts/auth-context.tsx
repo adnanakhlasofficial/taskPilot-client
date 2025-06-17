@@ -1,5 +1,6 @@
 "use client";
 
+import { redirect } from "next/navigation";
 import { createContext, useContext, useState, useEffect } from "react";
 
 interface AuthContextType {
@@ -16,7 +17,7 @@ interface UserType {
   userName: string;
   email: string;
   role: string;
-  avatar: string;
+  image: string;
 }
 
 // Mock users for demonstration
@@ -92,6 +93,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = () => {
     setUser(null);
+    redirect("/");
     localStorage.removeItem("user");
   };
 

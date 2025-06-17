@@ -1,25 +1,23 @@
 "use client";
 
-import { useSelector, useDispatch } from "react-redux";
-import {
-  selectCurrentUser,
-  selectCurrentToken,
-  selectIsAuthenticated,
-  selectAuthLoading,
-  selectAuthError,
-  logout as logoutAction,
-  clearError,
-  loadFromStorage,
-} from "@/store/slices/authSlice";
 import {
   useLoginMutation,
   useLogoutMutation,
   useRefreshTokenMutation,
 } from "@/store/api/authApi";
-import { useEffect } from "react";
+import {
+  clearError,
+  loadFromStorage,
+  logout as logoutAction,
+  selectAuthError,
+  selectAuthLoading,
+  selectCurrentToken,
+  selectCurrentUser,
+  selectIsAuthenticated,
+} from "@/store/slices/authSlice";
 import type { LoginCredentials, UserRole } from "@/types/auth";
-import { redirect } from "next/navigation";
-import { useRouter } from "next/router";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 export function useAuth() {
   const dispatch = useDispatch();

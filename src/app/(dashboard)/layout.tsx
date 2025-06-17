@@ -191,7 +191,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                   <FolderKanban className="size-4" />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">ProjectHub</span>
+                  <span className="truncate font-semibold">TaskPilot</span>
                   <span className="truncate text-xs text-muted-foreground">
                     Team Dashboard
                   </span>
@@ -235,16 +235,15 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                         className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                       >
                         <Avatar className="h-8 w-8 rounded-lg">
-                          {user?.avatar ? (
-                            <AvatarImage src={user.avatar} alt="User Avatar" />
-                          ) : (
-                            <CircleUserRound />
-                          )}
+                          <AvatarImage
+                            src={
+                              user?.image ||
+                              "/placeholder.svg?height=32&width=32"
+                            }
+                            alt="User"
+                          />
                           <AvatarFallback className="rounded-lg">
-                            {user?.userName
-                              ?.split(" ")
-                              .map((n) => n[0])
-                              .join("") || "U"}
+                            <CircleUserRound />
                           </AvatarFallback>
                         </Avatar>
                         <div className="grid flex-1 text-left text-sm leading-tight">
@@ -279,16 +278,13 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                           <Avatar className="h-8 w-8 rounded-lg">
                             <AvatarImage
                               src={
-                                user?.avatar ||
+                                user?.image ||
                                 "/placeholder.svg?height=32&width=32"
                               }
                               alt="User"
                             />
                             <AvatarFallback className="rounded-lg">
-                              {user?.userName
-                                ?.split(" ")
-                                .map((n) => n[0])
-                                .join("") || "U"}
+                              <CircleUserRound />
                             </AvatarFallback>
                           </Avatar>
                           <div className="grid flex-1 text-left text-sm leading-tight">
@@ -357,7 +353,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
                   {/* Header Actions */}
                   <div className="flex items-center gap-2">
-                    {hasRole(["admin", "co-leader"]) && (
+                    {hasRole(["admin"]) && (
                       <Button variant="outline" size="sm">
                         <Plus className="h-4 w-4 mr-2" />
                         New Project

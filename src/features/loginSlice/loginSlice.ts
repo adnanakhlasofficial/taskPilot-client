@@ -16,6 +16,14 @@ interface User {
   createdAt: string;
   updatedAt: string;
 }
+
+interface createUser {
+    userId: string,
+    userName: string,
+    email: string,
+    password: string,
+    role: string,
+}
 export const loginSlice = createApi({
     reducerPath: "api",
     baseQuery: fetchBaseQuery({
@@ -24,19 +32,27 @@ export const loginSlice = createApi({
     endpoints: (build) => ({
         // Login Mutation
         login: build.mutation({
-            query: (Credentials : Credentials) => ({
+            query: (credentials : Credentials) => ({
                 url: "/api/v1/auth/login",
                 method: "POST",
-                body: Credentials,
+                body: credentials,
             }),
         }),
         // Get All Users Query
-        userCreate: build.query<User[], void>({
+        getAllUser: build.query<User[], void>({
             query: () => ({
                 url: "/api/v1/user",
                 method: "GET"
             }),
         }),
+        //Create All Users 
+        createAllUser: build.mutation({
+            query: (newUser : createUser) => ({
+                url: '/api/v1/user/create',
+                method: "POST",
+                body: newUser,
+            })
+        })
     }),
 })
-export const {useLoginMutation, useUserCreateQuery} = loginSlice;
+export const {useLoginMutation, useGetAllUserQuery, useCreateAllUserMutation} = loginSlice;

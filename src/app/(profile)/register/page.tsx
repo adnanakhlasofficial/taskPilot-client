@@ -1,6 +1,5 @@
 "use client";
 
-import { useCreateAllUserMutation} from "@/features/loginSlice/loginSlice";
 import { useState } from "react";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -16,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2, LogIn } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useCreateAllUserMutation } from "@/store/slices/profileSlice";
 
 export default function RegisterForm() {
   const [userId, setuserId] = useState("");

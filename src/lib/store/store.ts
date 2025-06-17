@@ -1,4 +1,4 @@
-import { loginSlice } from "@/features/loginSlice/loginSlice"; 
+import { loginSlice } from "@/store/slices/profileSlice";
 import { configureStore } from "@reduxjs/toolkit";
 
 export const store = configureStore({

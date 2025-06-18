@@ -9,6 +9,20 @@ export type Project = {
   value: number;
 };
 
+export interface GetProjects {
+  id: string;
+  projectName: string;
+  projectId: string;
+  station: string;
+  deadline: string;
+  value: number;
+  team: string;
+  status: string;
+  lastUpdate?: string;
+  figmaLink?: string;
+  liveLink?: string;
+}
+
 export const projectApi = createApi({
   reducerPath: "projectApi",
   baseQuery: fetchBaseQuery({
@@ -26,7 +40,19 @@ export const projectApi = createApi({
         },
       }),
     }),
+
+    getProjects: builder.query<{ success: boolean; data: GetProjects[] }, void>(
+      {
+        query: () => ({
+          url: "/",
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
+          },
+        }),
+      }
+    ),
   }),
 });
 
-export const { useCreateProjectMutation } = projectApi;
+export const { useCreateProjectMutation, useGetProjectsQuery } = projectApi;

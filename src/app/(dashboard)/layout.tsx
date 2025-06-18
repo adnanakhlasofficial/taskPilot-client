@@ -51,7 +51,8 @@ import {
   Users,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { redirect, usePathname } from "next/navigation";
+import { useRouter } from "next/router";
 import type React from "react";
 import { Suspense } from "react";
 
@@ -88,19 +89,26 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           roles: ["admin", "co-leader", "member", "leader"],
         },
         {
-          title: "My Tasks",
-          icon: Target,
-          url: "/tasks",
-          isActive: pathname === "/tasks",
-          roles: ["admin", "co-leader", "team-member"],
+          title: "Add Project",
+          icon: FolderKanban,
+          url: "/projects/add-project",
+          isActive: pathname === "/projects/add-project",
+          roles: ["admin"],
         },
-        {
-          title: "Timeline",
-          icon: Calendar,
-          url: "/timeline",
-          isActive: pathname === "/timeline",
-          roles: ["admin", "co-leader", "team-member"],
-        },
+        // {
+        //   title: "My Tasks",
+        //   icon: Target,
+        //   url: "/tasks",
+        //   isActive: pathname === "/tasks",
+        //   roles: ["admin", "co-leader", "team-member"],
+        // },
+        // {
+        //   title: "Timeline",
+        //   icon: Calendar,
+        //   url: "/timeline",
+        //   isActive: pathname === "/timeline",
+        //   roles: ["admin", "co-leader", "team-member"],
+        // },
       ],
     },
     {
@@ -109,9 +117,16 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         {
           title: "Team Members",
           icon: Users,
-          url: "/team",
-          isActive: pathname === "/team",
+          url: "/teams",
+          isActive: pathname === "/teams",
           roles: ["admin", "co-leader"],
+        },
+        {
+          title: "Add Team Member",
+          icon: Users,
+          url: "/teams/create-team",
+          isActive: pathname === "/teams/create-team",
+          roles: ["admin", "leader"],
         },
         {
           title: "Bonus",
@@ -303,7 +318,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                         </div>
                       </DropdownMenuLabel>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => redirect("/profile/details")}
+                      >
                         <User className="mr-2 h-4 w-4" />
                         Profile
                       </DropdownMenuItem>

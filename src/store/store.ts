@@ -4,6 +4,7 @@ import { authApi } from "./api/authApi";
 import { projectApi } from "./api/projectApi";
 import { teamApi } from "./api/teamApi";
 import { usersApi } from "./api/usersApi";
+import { profileApi } from "./slices/profileSlice";
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     [projectApi.reducerPath]: projectApi.reducer,
     [teamApi.reducerPath]: teamApi.reducer,
     [usersApi.reducerPath]: usersApi.reducer,
+    [profileApi.reducerPath]: profileApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -22,7 +24,8 @@ export const store = configureStore({
       authApi.middleware,
       projectApi.middleware,
       teamApi.middleware,
-      usersApi.middleware
+      usersApi.middleware,
+      profileApi.middleware
     ),
 });
 

@@ -30,6 +30,17 @@ interface TeamResponse {
   data: Team[];
 }
 
+interface CreateTeamPayload {
+  teamName: string;
+  members: string[];
+}
+
+interface CreateTeamResponse {
+  success: boolean;
+  message: string;
+  data: Team;
+}
+
 export const teamApi = createApi({
   reducerPath: "teamApi",
   baseQuery: fetchBaseQuery({
@@ -39,7 +50,18 @@ export const teamApi = createApi({
     getTeams: builder.query<TeamResponse, void>({
       query: () => "/team",
     }),
+
+    createTeam: builder.mutation<CreateTeamResponse, CreateTeamPayload>({
+      query: (body) => ({
+        url: "/team/create",
+        method: "POST",
+        body,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
+        },
+      }),
+    }),
   }),
 });
 
-export const { useGetTeamsQuery } = teamApi;
+export const { useGetTeamsQuery, useCreateTeamMutation } = teamApi;

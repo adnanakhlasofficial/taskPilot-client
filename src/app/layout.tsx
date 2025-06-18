@@ -1,11 +1,10 @@
-import type React from "react";
+import { Toaster } from "@/components/ui/sonner";
+import { AuthProvider } from "@/contexts/auth-context";
+import { ReduxProvider } from "@/providers/redux-provider";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import type React from "react";
 import "./globals.css";
-import { AuthProvider } from "@/contexts/auth-context";
-import StoreProvider from "./StoreProvider";
-import { ReduxProvider } from "@/providers/redux-provider";
-import { Toaster } from "@/components/ui/sonner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,11 +21,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <StoreProvider>
-          <ReduxProvider>
-            <AuthProvider>{children}</AuthProvider>
-          </ReduxProvider>
-        </StoreProvider>
+        <ReduxProvider>
+          <AuthProvider>{children}</AuthProvider>
+        </ReduxProvider>
+
         <Toaster />
       </body>
     </html>

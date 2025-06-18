@@ -17,7 +17,7 @@ export default function BonusTable() {
   const users = data?.data || [];
 
   const handleGiveBonus = async (userId: string) => {
-    const amount = amounts[userId];
+    const amount = amounts[userId] * 100;
     if (!amount) return;
 
     try {
@@ -49,7 +49,10 @@ export default function BonusTable() {
         </thead>
         <tbody>
           {users.map((user: any, i: number) => (
-            <tr key={user.id} className="border-t">
+            <tr
+              key={user.id}
+              className={`border-t ${user.role === "admin" && "hidden"}`}
+            >
               <td className="p-2">{i + 1}</td>
               <td className="p-2 flex items-center gap-2">
                 <Image
@@ -68,12 +71,12 @@ export default function BonusTable() {
                   type="number"
                   placeholder="Amount"
                   value={amounts[user.id] || ""}
-                  onChange={(e) =>
+                  onChange={(e) => {
                     setAmounts({
                       ...amounts,
                       [user.id]: Number(e.target.value),
-                    })
-                  }
+                    });
+                  }}
                 />
               </td>
               <td className="p-2">

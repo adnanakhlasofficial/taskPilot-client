@@ -73,14 +73,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           icon: Home,
           url: "/dashboard",
           isActive: pathname === "/dashboard",
-          roles: ["admin", "co-leader", "team-member", "viewer"],
-        },
-        {
-          title: "Analytics",
-          icon: BarChart3,
-          url: "/analytics",
-          isActive: pathname === "/analytics",
-          roles: ["admin", "co-leader"],
+          roles: ["admin", "co-leader", "member", "leader"],
         },
       ],
     },
@@ -92,7 +85,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           icon: FolderKanban,
           url: "/projects",
           isActive: pathname === "/projects",
-          roles: ["admin", "co-leader"],
+          roles: ["admin", "co-leader", "member", "leader"],
         },
         {
           title: "My Tasks",
@@ -121,33 +114,33 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           roles: ["admin", "co-leader"],
         },
         {
-          title: "Performance",
+          title: "Bonus",
           icon: TrendingUp,
-          url: "/performance",
-          isActive: pathname === "/performance",
-          roles: ["admin", "co-leader"],
+          url: "/bonus",
+          isActive: pathname === "/bonus",
+          roles: ["admin"],
         },
       ],
     },
-    {
-      title: "Management",
-      items: [
-        {
-          title: "Clients",
-          icon: Briefcase,
-          url: "/clients",
-          isActive: pathname === "/clients",
-          roles: ["admin", "co-leader"],
-        },
-        {
-          title: "Time Tracking",
-          icon: Clock,
-          url: "/time-tracking",
-          isActive: pathname === "/time-tracking",
-          roles: ["admin", "co-leader", "team-member"],
-        },
-      ],
-    },
+    // {
+    //   title: "Management",
+    //   items: [
+    //     {
+    //       title: "Clients",
+    //       icon: Briefcase,
+    //       url: "/clients",
+    //       isActive: pathname === "/clients",
+    //       roles: ["admin", "co-leader"],
+    //     },
+    //     {
+    //       title: "Time Tracking",
+    //       icon: Clock,
+    //       url: "/time-tracking",
+    //       isActive: pathname === "/time-tracking",
+    //       roles: ["admin", "co-leader", "team-member"],
+    //     },
+    //   ],
+    // },
   ];
 
   const handleLogout = () => {

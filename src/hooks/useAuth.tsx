@@ -90,6 +90,7 @@ export function useAuth() {
     token,
     isAuthenticated,
     isLoading: isLoading || isLoginLoading,
+    isLoginLoading,
     error,
     login,
     logout,

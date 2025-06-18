@@ -10,19 +10,22 @@ import { FaRegEdit } from "react-icons/fa";
 import { useAuth } from "@/contexts/auth-context";
 
 export default function ProfilePage() {
-  const { user, isLoginLoading } = useAuth();
-
+  const { user} = useAuth();
+  const defaultBackgroundImage =
+    "https://images.unsplash.com/photo-1557804506-669a67965ba0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
   return (
     <div className="min-h-screen flex items-center justify-center bg-muted p-4">
       <Card className="w-full max-w-md overflow-hidden shadow-md rounded-2xl relative">
         <div
           className="relative h-36 md:h-44 bg-cover bg-center"
-          style={{ backgroundImage: `url('${user?.photo || "https://source.unsplash.com/800x300/?user"}')` }}
+          style={{ backgroundImage: `url('${user?.image || defaultBackgroundImage}')` }}
         >
           <div className="absolute inset-0 bg-black/30" />
           <div className="absolute -bottom-12 left-1/2 transform -translate-x-1/2">
             <Avatar className="h-24 w-24 ring-4 ring-white shadow-md">
-              <AvatarImage src={user?.photo} alt={user?.userName} />
+              {
+                user?.image ? (<AvatarImage src={user?.image} alt={user?.userName} />) : (<AvatarImage src={defaultBackgroundImage} />)
+              }
               <AvatarFallback>{user?.userName?.charAt(0)}</AvatarFallback>
             </Avatar>
           </div>

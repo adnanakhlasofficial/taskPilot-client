@@ -1,69 +1,140 @@
 "use client";
 
-import { useState } from "react";
-import ChatSidebarFull from "@/components/chat-sidebar-full";
-import ChatWindowFull from "@/components/chat-window-full";
-import RoleGuard from "@/components/role-guard";
+import { useEffect, useRef, useState } from "react";
+import { io } from "socket.io-client";
+import { formatDistanceToNow } from "date-fns";
+import { useAuth } from "@/hooks/useAuth";
+import clsx from "clsx";
 
-export default function ChatPage() {
-  const [activeChannel, setActiveChannel] = useState("general");
+const socket = io("https://task-management-production-7b6f.up.railway.app", {
+  withCredentials: true,
+});
 
-  const getChannelInfo = (channelId: string) => {
-    const channelMap: Record<
-      string,
-      {
-        name: string;
-        type: "channel" | "dm" | "group";
-        isPrivate?: boolean;
-        members?: number;
-      }
-    > = {
-      general: { name: "general", type: "channel", members: 12 },
-      "prj-001": {
-        name: "prj-001-alpha",
-        type: "channel",
-        isPrivate: true,
-        members: 5,
-      },
-      "prj-002": {
-        name: "prj-002-beta",
-        type: "channel",
-        isPrivate: true,
-        members: 8,
-      },
-      "design-team": { name: "design-team", type: "channel", members: 6 },
-      "dev-team": { name: "dev-team", type: "channel", members: 10 },
-      announcements: { name: "announcements", type: "channel", members: 25 },
-      "group-leads": { name: "Team Leads", type: "group", members: 3 },
-      "group-frontend": { name: "Frontend Guild", type: "group", members: 8 },
-      "dm-john": { name: "John Doe", type: "dm" },
-      "dm-jane": { name: "Jane Smith", type: "dm" },
-      "dm-bob": { name: "Bob Wilson", type: "dm" },
-      "dm-alice": { name: "Alice Cooper", type: "dm" },
-      "dm-mike": { name: "Mike Johnson", type: "dm" },
+interface Message {
+  id: string;
+  content: string;
+  createdAt: string;
+  sender: { id: string; userName: string };
+}
+
+export default function ChatApp() {
+  const { user } = useAuth();
+  const [roomId, setRoomId] = useState("");
+  const [userId, setUserId] = useState(user?.id || "");
+  const [input, setInput] = useState("");
+  const [messages, setMessages] = useState<Message[]>([]);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    socket.on("chat-history", (history: Message[]) => {
+      setMessages(history);
+    });
+    socket.on("chat-message", (message: Message) => {
+      setMessages((prev) => [...prev, message]);
+    });
+    return () => {
+      socket.off("chat-history");
+      socket.off("chat-message");
     };
-    return channelMap[channelId] || { name: "Unknown", type: "channel" };
+  }, []);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  const joinRoom = () => {
+    if (!roomId) return;
+    socket.emit("join-room", { roomId, senderId: userId });
   };
 
-  const channelInfo = getChannelInfo(activeChannel);
+  const sendMessage = () => {
+    if (!input || !roomId || !userId) return;
+    socket.emit("chat-message", { roomId, senderId: userId, content: input });
+    setInput("");
+  };
 
   return (
-    <RoleGuard allowedRoles={["admin", "leader", "member"]}>
-      <div className="h-[calc(100vh-8rem)] flex bg-background border rounded-lg overflow-hidden shadow-sm">
-        <ChatSidebarFull
-          activeChannel={activeChannel}
-          onChannelSelect={setActiveChannel}
+    <div className="flex flex-col bg-background text-foreground">
+      {/* Header */}
+      <header className="p-4 border-b border-border font-semibold text-lg">
+        Realtime Chat
+      </header>
+
+      {/* Controls */}
+      <div className="p-4 flex flex-col md:flex-row gap-3 items-center justify-center border-b border-border bg-muted">
+        <input
+          className="border px-3 py-2 rounded-md w-full md:w-1/4"
+          placeholder="Room ID"
+          value={roomId}
+          onChange={(e) => setRoomId(e.target.value)}
         />
-        <div className="flex-1">
-          <ChatWindowFull
-            channelId={activeChannel}
-            channelName={channelInfo.name}
-            channelType={channelInfo.type}
-            isPrivate={channelInfo.isPrivate}
-            members={channelInfo.members}
-          />
-        </div>
+        <input
+          className="border px-3 py-2 rounded-md w-full md:w-1/4"
+          placeholder="Your User ID"
+          value={userId}
+          onChange={(e) => setUserId(e.target.value)}
+        />
+        <button
+          className="bg-primary text-primary-foreground px-4 py-2 rounded-md"
+          onClick={joinRoom}
+        >
+          Join Room
+        </button>
       </div>
-    </RoleGuard>
+
+      {/* Message List */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-3">
+        {messages.map((msg) => {
+          const isMe = msg.sender.id === userId;
+          return (
+            <div
+              key={msg.id}
+              className={clsx("flex", isMe ? "justify-end" : "justify-start")}
+            >
+              <div
+                className={clsx(
+                  "p-3 rounded-lg shadow-sm max-w-sm break-words",
+                  isMe
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-muted text-muted-foreground"
+                )}
+              >
+                {!isMe && (
+                  <div className="font-semibold text-sm mb-1">
+                    {msg.sender.userName}
+                  </div>
+                )}
+                <div>{msg.content}</div>
+                <div className="text-xs text-right mt-2 opacity-60">
+                  {formatDistanceToNow(new Date(msg.createdAt), {
+                    addSuffix: true,
+                  })}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+        <div ref={messagesEndRef} />
+      </div>
+
+      {/* Input */}
+      <footer className="p-4 border-t border-border bg-background">
+        <div className="flex items-center gap-3">
+          <input
+            className="flex-1 border px-3 py-2 rounded-md"
+            placeholder="Type a message"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+          />
+          <button
+            className="bg-primary text-primary-foreground px-4 py-2 rounded-md"
+            onClick={sendMessage}
+          >
+            Send
+          </button>
+        </div>
+      </footer>
+    </div>
   );
 }

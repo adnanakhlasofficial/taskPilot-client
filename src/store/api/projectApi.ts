@@ -26,7 +26,8 @@ export interface GetProjects {
 export const projectApi = createApi({
   reducerPath: "projectApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://task-pilot-server2.vercel.app/api/v1/project",
+    baseUrl:
+      "https://task-management-production-7b6f.up.railway.app/api/v1/project",
   }),
   endpoints: (builder) => ({
     createProject: builder.mutation<void, Project>({

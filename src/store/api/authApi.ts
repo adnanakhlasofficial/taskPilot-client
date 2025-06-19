@@ -8,7 +8,7 @@ import type {
 import type { RootState } from "@/store/store";
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: "https://task-pilot-server2.vercel.app/api/v1",
+  baseUrl: "https://task-management-production-7b6f.up.railway.app/api/v1",
   prepareHeaders: (headers, { getState }) => {
     const token = (getState() as RootState).auth.token;
     if (token) {

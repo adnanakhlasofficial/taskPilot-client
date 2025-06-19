@@ -1,4 +1,4 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 interface Credentials {
   userId: string;
@@ -18,41 +18,45 @@ interface User {
 }
 
 interface createUser {
-    userId: string,
-    userName: string,
-    email: string,
-    password: string,
-    role: string,
+  userId: string;
+  userName: string;
+  email: string;
+  password: string;
+  role: string;
 }
 export const loginSlice = createApi({
-    reducerPath: "api",
-    baseQuery: fetchBaseQuery({
-        baseUrl: "https://task-pilot-server2.vercel.app",
+  reducerPath: "api",
+  baseQuery: fetchBaseQuery({
+    baseUrl: "https://task-management-production-7b6f.up.railway.app",
+  }),
+  endpoints: (build) => ({
+    // Login Mutation
+    login: build.mutation({
+      query: (credentials: Credentials) => ({
+        url: "/api/v1/auth/login",
+        method: "POST",
+        body: credentials,
+      }),
     }),
-    endpoints: (build) => ({
-        // Login Mutation
-        login: build.mutation({
-            query: (credentials : Credentials) => ({
-                url: "/api/v1/auth/login",
-                method: "POST",
-                body: credentials,
-            }),
-        }),
-        // Get All Users Query
-        getAllUser: build.query<User[], void>({
-            query: () => ({
-                url: "/api/v1/user",
-                method: "GET"
-            }),
-        }),
-        //Create All Users 
-        createAllUser: build.mutation({
-            query: (newUser : createUser) => ({
-                url: '/api/v1/user/create',
-                method: "POST",
-                body: newUser,
-            })
-        })
+    // Get All Users Query
+    getAllUser: build.query<User[], void>({
+      query: () => ({
+        url: "/api/v1/user",
+        method: "GET",
+      }),
     }),
-})
-export const {useLoginMutation, useGetAllUserQuery, useCreateAllUserMutation} = loginSlice;
+    //Create All Users
+    createAllUser: build.mutation({
+      query: (newUser: createUser) => ({
+        url: "/api/v1/user/create",
+        method: "POST",
+        body: newUser,
+      }),
+    }),
+  }),
+});
+export const {
+  useLoginMutation,
+  useGetAllUserQuery,
+  useCreateAllUserMutation,
+} = loginSlice;

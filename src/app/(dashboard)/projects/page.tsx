@@ -1,181 +1,150 @@
 "use client";
 
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { useState } from "react";
-import dayjs from "dayjs";
+import Link from "next/link";
 import { useGetProjectsQuery } from "@/store/api/projectApi";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 
-const statusOptions = ["new", "wip", "hold", "completed", "cancelled"];
-const clientStatusOptions = ["active", "inactive", "satisfied", "unsatisfied"];
+export default function ProjectListPage() {
+  const { data, isLoading, error } = useGetProjectsQuery();
 
-export default function ProjectTable() {
-  const { data, isLoading } = useGetProjectsQuery();
-  const projects = data?.data || [];
+  if (isLoading) {
+    return (
+      <div className="p-6 space-y-4 max-w-6xl mx-auto">
+        <Skeleton className="h-6 w-40" />
+        <Skeleton className="h-[400px] w-full" />
+      </div>
+    );
+  }
 
-  const [editedProjects, setEditedProjects] = useState<{ [id: string]: any }>(
-    {}
-  );
-
-  const handleEdit = (id: string, field: string, value: any) => {
-    setEditedProjects((prev) => ({
-      ...prev,
-      [id]: { ...prev[id], [field]: value },
-    }));
-  };
-
-  const handleSave = (id: string) => {
-    const updated = { id, ...editedProjects[id] };
-    console.log("Save update:", updated);
-    // TODO: Trigger your mutation
-  };
+  if (error || !data?.success) {
+    return (
+      <div className="text-center text-red-500 mt-10">
+        Failed to load projects
+      </div>
+    );
+  }
 
   return (
-    <div className="overflow-x-auto mt-6">
-      <table className="w-full border border-gray-300 text-sm">
-        <thead className="bg-gray-100">
-          <tr>
-            <th className="p-2">#</th>
-            <th className="p-2">Project Name</th>
-            <th className="p-2">Project ID</th>
-            <th className="p-2">Station</th>
-            <th className="p-2">Deadline</th>
-            <th className="p-2">Project Status</th>
-            <th className="p-2">Client Status</th>
-            <th className="p-2">Team</th>
-            <th className="p-2">Figma Link</th>
-            <th className="p-2">Live Link</th>
-            <th className="p-2">Requirements</th>
-            <th className="p-2">Note</th>
-            <th className="p-2">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {projects.map((project, index) => {
-            const edited = editedProjects[project.id] || {};
-            return (
-              <tr key={project.id} className="border-t">
-                <td className="p-2">{index + 1}</td>
-                <td className="p-2">
-                  <Input
-                    value={edited.projectName ?? project.projectName}
-                    onChange={(e) =>
-                      handleEdit(project.id, "projectName", e.target.value)
-                    }
-                  />
-                </td>
-                <td className="p-2">{project.projectId}</td>
-                <td className="p-2">
-                  <Input
-                    value={edited.station ?? project.station}
-                    onChange={(e) =>
-                      handleEdit(project.id, "station", e.target.value)
-                    }
-                  />
-                </td>
-                <td className="p-2">
-                  {dayjs(project.deadline).format("YYYY-MM-DD")}
-                </td>
-                <td className="p-2">
-                  <Select
-                    value={edited.projectStatus ?? project.projectStatus}
-                    onValueChange={(value) =>
-                      handleEdit(project.id, "projectStatus", value)
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {statusOptions.map((status) => (
-                        <SelectItem key={status} value={status}>
-                          {status}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </td>
-                <td className="p-2">
-                  <Select
-                    value={edited.clientStatus ?? project.clientStatus}
-                    onValueChange={(value) =>
-                      handleEdit(project.id, "clientStatus", value)
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Client" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {clientStatusOptions.map((status) => (
-                        <SelectItem key={status} value={status}>
-                          {status}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </td>
-                <td className="p-2">{project.team?.teamName || "—"}</td>
-                <td className="p-2">
-                  <Input
-                    placeholder="Figma URL"
-                    value={edited.figmaLink ?? project.figmaLink ?? ""}
-                    onChange={(e) =>
-                      handleEdit(project.id, "figmaLink", e.target.value)
-                    }
-                  />
-                </td>
-                <td className="p-2">
-                  <Input
-                    placeholder="Live URL"
-                    value={edited.liveLink ?? project.liveLink ?? ""}
-                    onChange={(e) =>
-                      handleEdit(project.id, "liveLink", e.target.value)
-                    }
-                  />
-                </td>
-                <td className="p-2">
-                  <Input
-                    placeholder="Req. Link"
-                    value={
-                      edited.requirementsLink ?? project.requirementsLink ?? ""
-                    }
-                    onChange={(e) =>
-                      handleEdit(project.id, "requirementsLink", e.target.value)
-                    }
-                  />
-                </td>
-                <td className="p-2">
-                  <Input
-                    placeholder="Note"
-                    value={edited.note ?? project.note ?? ""}
-                    onChange={(e) =>
-                      handleEdit(project.id, "note", e.target.value)
-                    }
-                  />
-                </td>
-                <td className="p-2">
-                  <Button size="sm" onClick={() => handleSave(project.id)}>
-                    Save
-                  </Button>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-
-      {isLoading && (
-        <p className="text-center text-sm text-gray-500 mt-4">
-          Loading projects...
-        </p>
-      )}
+    <div className="p-6 w-full">
+      <h2 className="text-xl font-semibold mb-4">All Projects</h2>
+      <div className="overflow-auto border rounded-lg">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Project Name</TableHead>
+              <TableHead>Project ID</TableHead>
+              <TableHead>Station</TableHead>
+              <TableHead>Deadline</TableHead>
+              <TableHead>Delivery Estimate</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Client</TableHead>
+              <TableHead>Value ($)</TableHead>
+              <TableHead>Figma</TableHead>
+              <TableHead>Live</TableHead>
+              <TableHead>Delivered</TableHead>
+              <TableHead>Requirements</TableHead>
+              <TableHead>Team</TableHead>
+              <TableHead>Rating</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {data.data.map((project) => (
+              <Link
+                href={`/projects/${project.id}`}
+                key={project.id}
+                className="contents"
+              >
+                <TableRow className="hover:bg-muted transition cursor-pointer">
+                  <TableCell>{project.projectName}</TableCell>
+                  <TableCell>{project.projectId}</TableCell>
+                  <TableCell>{project.station}</TableCell>
+                  <TableCell>{project.deadline?.split("T")[0]}</TableCell>
+                  <TableCell>
+                    {project.estimateDelivery ?? (
+                      <span className="text-muted-foreground">Not set</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <Badge
+                      variant={
+                        project.projectStatus === "wip"
+                          ? "secondary"
+                          : "outline"
+                      }
+                    >
+                      {project.projectStatus}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>{project.clientStatus}</TableCell>
+                  <TableCell className="text-right">{project.value}</TableCell>
+                  <TableCell>
+                    {project.figmaLink ? (
+                      <a
+                        href={project.figmaLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 underline"
+                      >
+                        Open
+                      </a>
+                    ) : (
+                      <span className="text-muted-foreground">N/A</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {project.liveLink ? (
+                      <a
+                        href={project.liveLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 underline"
+                      >
+                        Open
+                      </a>
+                    ) : (
+                      <span className="text-muted-foreground">N/A</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {project.deliveredDate ? (
+                      project.deliveredDate.split("T")[0]
+                    ) : (
+                      <span className="text-muted-foreground">
+                        Not delivered
+                      </span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {project.requirementsLink ? (
+                      <a
+                        href={project.requirementsLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 underline"
+                      >
+                        Open
+                      </a>
+                    ) : (
+                      <span className="text-muted-foreground">N/A</span>
+                    )}
+                  </TableCell>
+                  <TableCell>{project.team?.teamName || "No Team"}</TableCell>
+                  <TableCell>{project.rating}</TableCell>
+                </TableRow>
+              </Link>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 }

@@ -1,130 +1,273 @@
 "use client";
 
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useParams } from "next/navigation";
 import {
-  Form,
-  FormField,
-  FormItem,
-  FormControl,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+  useGetProjectByIdQuery,
+  useUpdateProjectMutation,
+} from "@/store/api/projectApi";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { MultiSelect } from "@/components/ui/multi-select";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@/components/ui/select";
-import { useUpdateProjectMembersMutation } from "@/store/api/projectApi";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
-const schema = z.object({
-  teamId: z.string().min(1),
-  uiMemberIds: z.array(z.string()),
-  frontendMemberIds: z.array(z.string()),
-  backendMemberIds: z.array(z.string()),
-});
+export default function ProjectUpdateForm() {
+  const { id } = useParams();
+  const { data, isLoading, error } = useGetProjectByIdQuery(id as string);
+  const [updateProject, { isLoading: isUpdating }] = useUpdateProjectMutation();
 
-type FormValues = z.infer<typeof schema>;
-
-const teamOptions = [
-  { label: "Team 1", value: "6851d5f4c35435a9e7b1b454" },
-  { label: "Team 2", value: "6851d675c35435a9e7b1b458" },
-];
-
-const memberOptions = [
-  { label: "Mazharul (U0001)", value: "U0001" },
-  { label: "Adnan (U0002)", value: "U0002" },
-  { label: "Sifat (U0003)", value: "U0003" },
-];
-
-export function UpdateProjectForm({ projectId }: { projectId: string }) {
-  const form = useForm<FormValues>({
-    resolver: zodResolver(schema),
-    defaultValues: {
-      teamId: "",
-      uiMemberIds: [],
-      frontendMemberIds: [],
-      backendMemberIds: [],
-    },
+  const [form, setForm] = useState({
+    projectName: "",
+    projectId: "",
+    station: "",
+    deadline: "",
+    estimateDelivery: "",
+    deliveredDate: "",
+    value: 0,
+    figmaLink: "",
+    liveLink: "",
+    requirementsLink: "",
+    note: "",
+    projectStatus: "",
+    clientStatus: "",
   });
 
-  const [updateProject, { isLoading }] = useUpdateProjectMembersMutation();
+  useEffect(() => {
+    if (data?.success) {
+      const p = data.data;
+      setForm({
+        projectName: p.projectName || "",
+        projectId: p.projectId || "",
+        station: p.station || "",
+        deadline: p.deadline?.split("T")[0] || "",
+        estimateDelivery: p.estimateDelivery?.split("T")[0] || "",
+        deliveredDate: p.deliveredDate?.split("T")[0] || "",
+        value: p.value || 0,
+        figmaLink: p.figmaLink || "",
+        liveLink: p.liveLink || "",
+        requirementsLink: p.requirementsLink || "",
+        note: p.note || "",
+        projectStatus: p.projectStatus || "",
+        clientStatus: p.clientStatus || "",
+      });
+    }
+  }, [data]);
 
-  const onSubmit = async (values: FormValues) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [name]: name === "value" ? Number(value) : value,
+    }));
+  };
+
+  const handleSubmit = async () => {
     try {
-      await updateProject({ projectId, ...values }).unwrap();
-      console.log("Project updated successfully!");
+      const payload = {
+        ...form,
+        deadline: form.deadline ? new Date(form.deadline) : null,
+        estimateDelivery: form.estimateDelivery
+          ? new Date(form.estimateDelivery)
+          : null,
+        deliveredDate: form.deliveredDate ? new Date(form.deliveredDate) : null,
+      };
+
+      await updateProject({ id: id as string, payload }).unwrap();
+      toast.success("✅ Project updated successfully");
     } catch (err) {
-      console.error("Failed to update project:", err);
+      console.error(err);
+      toast.error("❌ Update failed");
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="p-6 max-w-4xl mx-auto space-y-4">
+        <Skeleton className="h-6 w-40" />
+        <Skeleton className="h-[300px] w-full" />
+      </div>
+    );
+  }
+
+  if (error || !data?.success) {
+    return (
+      <div className="text-center text-red-500 mt-10">
+        Failed to load project.
+      </div>
+    );
+  }
+
   return (
-    <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-4 p-4 max-w-xl mx-auto"
-      >
-        <FormField
-          control={form.control}
-          name="teamId"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Team</FormLabel>
-              <FormControl>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a team" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {teamOptions.map((opt) => (
-                      <SelectItem key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {["uiMemberIds", "frontendMemberIds", "backendMemberIds"].map((key) => (
+    <div className="p-6 max-w-4xl mx-auto">
+      <Card>
+        <CardHeader>
+          <CardTitle>Update Project</CardTitle>
+        </CardHeader>
+        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField
-            key={key}
-            control={form.control}
-            name={key as keyof FormValues}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="capitalize">
-                  {key.replace(/([A-Z])/g, " $1")}
-                </FormLabel>
-                <FormControl>
-                  <MultiSelect
-                    options={memberOptions}
-                    values={field.value}
-                    onChange={field.onChange}
-                    placeholder="Select members"
-                  />
-                </FormControl>
-              </FormItem>
-            )}
+            label="Project Name"
+            name="projectName"
+            value={form.projectName}
+            onChange={handleChange}
           />
-        ))}
+          <FormField
+            label="Project ID"
+            name="projectId"
+            value={form.projectId}
+            onChange={handleChange}
+          />
+          <FormField
+            label="Station"
+            name="station"
+            value={form.station}
+            onChange={handleChange}
+          />
+          <FormField
+            label="Deadline"
+            name="deadline"
+            type="date"
+            value={form.deadline}
+            onChange={handleChange}
+          />
+          <FormField
+            label="Estimated Delivery"
+            name="estimateDelivery"
+            type="date"
+            value={form.estimateDelivery}
+            onChange={handleChange}
+          />
+          <FormField
+            label="Delivered Date"
+            name="deliveredDate"
+            type="date"
+            value={form.deliveredDate}
+            onChange={handleChange}
+          />
+          <SelectField
+            label="Project Status"
+            name="projectStatus"
+            value={form.projectStatus}
+            onChange={handleChange}
+            options={[
+              "new",
+              "ui_ux",
+              "wip",
+              "qa",
+              "delivered",
+              "revision",
+              "cancelled",
+            ]}
+          />
+          <SelectField
+            label="Client Status"
+            name="clientStatus"
+            value={form.clientStatus}
+            onChange={handleChange}
+            options={[
+              "active",
+              "satisfied",
+              "neutral",
+              "dissatisfied",
+              "inactive",
+            ]}
+          />
+          <FormField
+            label="Value"
+            name="value"
+            type="number"
+            value={form.value}
+            onChange={handleChange}
+          />
+          <FormField
+            label="Figma Link"
+            name="figmaLink"
+            value={form.figmaLink}
+            onChange={handleChange}
+          />
+          <FormField
+            label="Live Link"
+            name="liveLink"
+            value={form.liveLink}
+            onChange={handleChange}
+          />
+          <FormField
+            label="Requirements Link"
+            name="requirementsLink"
+            value={form.requirementsLink}
+            onChange={handleChange}
+          />
+          <div className="md:col-span-2">
+            <Label className="text-sm">Note</Label>
+            <Textarea name="note" value={form.note} onChange={handleChange} />
+          </div>
+          <div className="md:col-span-2 flex justify-end">
+            <Button onClick={handleSubmit} disabled={isUpdating}>
+              {isUpdating ? "Updating..." : "Update Project"}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
 
-        <Button type="submit" className="w-full" disabled={isLoading}>
-          {isLoading ? "Updating..." : "Update Project"}
-        </Button>
-      </form>
-    </Form>
+function FormField({
+  label,
+  name,
+  value,
+  onChange,
+  type = "text",
+}: {
+  label: string;
+  name: string;
+  value: any;
+  onChange: (e: any) => void;
+  type?: string;
+}) {
+  return (
+    <div>
+      <Label className="text-sm">{label}</Label>
+      <Input type={type} name={name} value={value} onChange={onChange} />
+    </div>
+  );
+}
+
+function SelectField({
+  label,
+  name,
+  value,
+  onChange,
+  options,
+}: {
+  label: string;
+  name: string;
+  value: string;
+  onChange: (e: any) => void;
+  options: string[];
+}) {
+  return (
+    <div>
+      <Label className="text-sm">{label}</Label>
+      <select
+        name={name}
+        value={value}
+        onChange={onChange}
+        className="w-full border rounded-md p-2 text-sm"
+      >
+        <option value="">Select {label.toLowerCase()}</option>
+        {options.map((opt) => (
+          <option key={opt} value={opt}>
+            {opt.charAt(0).toUpperCase() + opt.slice(1)}
+          </option>
+        ))}
+      </select>
+    </div>
   );
 }

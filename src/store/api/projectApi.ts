@@ -1,4 +1,3 @@
-// features/api/projectApi.ts
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export type Project = {
@@ -27,7 +26,7 @@ export const projectApi = createApi({
   reducerPath: "projectApi",
   baseQuery: fetchBaseQuery({
     baseUrl:
-      "https://task-management-production-7b6f.up.railway.app/api/v1/project",
+      "https://taskpilot-server2-production.up.railway.app/api/v1/project",
   }),
   endpoints: (builder) => ({
     createProject: builder.mutation<void, Project>({
@@ -53,7 +52,40 @@ export const projectApi = createApi({
         }),
       }
     ),
+
+    getProjectById: builder.query<
+      { success: boolean; data: GetProjects },
+      string
+    >({
+      query: (projectId) => ({
+        url: `/${projectId}`,
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
+        },
+      }),
+    }),
+
+    updateProject: builder.mutation<
+      { success: boolean; message: string },
+      { id: string; payload: Partial<Project> }
+    >({
+      query: ({ id, payload }) => ({
+        url: `/${id}`,
+        method: "PATCH",
+        body: payload,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
+        },
+      }),
+    }),
   }),
 });
 
-export const { useCreateProjectMutation, useGetProjectsQuery } = projectApi;
+export const {
+  useCreateProjectMutation,
+  useGetProjectsQuery,
+  useGetProjectByIdQuery,
+  useUpdateProjectMutation, // 👈 added export
+} = projectApi;

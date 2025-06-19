@@ -6,7 +6,7 @@ import { formatDistanceToNow } from "date-fns";
 import { useAuth } from "@/hooks/useAuth";
 import clsx from "clsx";
 
-const socket = io("https://task-management-production-7b6f.up.railway.app", {
+const socket = io("https://taskpilot-server2-production.up.railway.app", {
   withCredentials: true,
 });
 

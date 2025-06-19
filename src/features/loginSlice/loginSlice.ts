@@ -27,7 +27,7 @@ interface createUser {
 export const loginSlice = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://task-management-production-7b6f.up.railway.app",
+    baseUrl: "https://taskpilot-server2-production.up.railway.app",
   }),
   endpoints: (build) => ({
     // Login Mutation

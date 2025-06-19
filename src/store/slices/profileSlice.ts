@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 export const profileApi = createApi({
   reducerPath: "profileApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://task-management-production-7b6f.up.railway.app",
+    baseUrl: "https://taskpilot-server2-production.up.railway.app",
   }),
   tagTypes: ["Profile"],
   endpoints: (builder) => ({

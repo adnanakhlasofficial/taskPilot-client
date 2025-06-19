@@ -1,36 +1,28 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Of course! Here's a simple and clean `README.md` for your **TaskPilot** project:
 
-## Getting Started
+---
 
-First, run the development server:
+# TaskPilot
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+**Live Demo**: [https://task-pilot-client-eight.vercel.app/](https://task-pilot-client-eight.vercel.app/)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+TaskPilot is a lightweight project management dashboard that lets users create, update, assign, and collaborate on projects with their team.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## ✨ Features
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Create and update projects
+- Assign team members
+- Real-time team chat
+- Admin login for control panel access
 
-## Learn More
+**Admin Login:**
 
-To learn more about Next.js, take a look at the following resources:
+- **ID:** `U0001`
+- **Password:** `123456`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🚧 Tech Stack
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Next.js
+- Tailwind CSS
+- ShadCN UI
+- Socket.IO

@@ -20,7 +20,14 @@ interface Message {
 
 export default function ChatApp() {
   const { user, isLoading } = useAuth();
-  const localUser = JSON.parse(localStorage.getItem("user") || "{}");
+  const [localUser, setLocalUser] = useState({});
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setLocalUser(JSON.parse(storedUser));
+    }
+  }, []);
 
   const [roomId, setRoomId] = useState("");
   const [userId, setUserId] = useState(localUser?.id);

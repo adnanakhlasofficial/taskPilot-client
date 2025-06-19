@@ -7,10 +7,18 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { FaRegEdit } from "react-icons/fa";
 import { useAuth } from "@/contexts/auth-context";
+import { useEffect, useState } from "react";
 
 export default function ProfilePage() {
   const { user } = useAuth();
-  const localUser = JSON.parse(localStorage.getItem("user") || "{}");
+  const [localUser, setLocalUser] = useState({});
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setLocalUser(JSON.parse(storedUser));
+    }
+  }, []);
 
   const defaultBackgroundImage =
     "https://images.unsplash.com/photo-1557804506-669a67965ba0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80";

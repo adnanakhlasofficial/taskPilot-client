@@ -31,12 +31,12 @@ export default function TeamTable() {
           key={team.id}
           className="mb-10 border border-gray-200 rounded-md shadow-sm"
         >
-          <div className="flex items-center justify-between px-4 py-3 border-b bg-gray-50">
+          {/* <div className="flex items-center justify-between px-4 py-3 border-b bg-gray-50">
             <h2 className="text-lg font-semibold">{team.teamName}</h2>
             <Button variant="outline" className="text-sm">
               Update Team
             </Button>
-          </div>
+          </div> */}
 
           <div className="overflow-x-auto">
             <Table>

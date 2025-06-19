@@ -44,7 +44,7 @@ interface CreateTeamResponse {
 export const teamApi = createApi({
   reducerPath: "teamApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://taskpilot-server2-production.up.railway.app/api/v1",
+    baseUrl: "https://task-management-production-7b6f.up.railway.app/api/v1",
   }),
   endpoints: (builder) => ({
     getTeams: builder.query<TeamResponse, void>({

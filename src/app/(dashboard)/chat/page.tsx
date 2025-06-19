@@ -7,7 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useGetChatRoomsQuery } from "@/store/api/chatApi";
 import clsx from "clsx";
 
-const socket = io("https://taskpilot-server2-production.up.railway.app", {
+const socket = io("https://task-management-production-7b6f.up.railway.app", {
   withCredentials: true,
 });
 

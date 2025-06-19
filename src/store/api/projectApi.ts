@@ -26,7 +26,7 @@ export const projectApi = createApi({
   reducerPath: "projectApi",
   baseQuery: fetchBaseQuery({
     baseUrl:
-      "https://taskpilot-server2-production.up.railway.app/api/v1/project",
+      "https://task-management-production-7b6f.up.railway.app/api/v1/project",
   }),
   endpoints: (builder) => ({
     createProject: builder.mutation<void, Project>({

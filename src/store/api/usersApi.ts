@@ -4,7 +4,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 export const usersApi = createApi({
   reducerPath: "usersApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://taskpilot-server2-production.up.railway.app/api/v1",
+    baseUrl: "https://task-management-production-7b6f.up.railway.app/api/v1",
   }),
   endpoints: (builder) => ({
     // Get all users

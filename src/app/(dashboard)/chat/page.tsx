@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
 import { formatDistanceToNow } from "date-fns";
 import { useAuth } from "@/hooks/useAuth";
+import { useGetChatRoomsQuery } from "@/store/api/chatApi";
 import clsx from "clsx";
 
 const socket = io("https://taskpilot-server2-production.up.railway.app", {
@@ -18,20 +19,22 @@ interface Message {
 }
 
 export default function ChatApp() {
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
+  const localUser = JSON.parse(localStorage.getItem("user") || "{}");
+
   const [roomId, setRoomId] = useState("");
-  const [userId, setUserId] = useState(user?.id || "");
+  const [userId, setUserId] = useState(localUser?.id);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  const { data: roomData, isLoading: loadingRooms } = useGetChatRoomsQuery();
+
   useEffect(() => {
-    socket.on("chat-history", (history: Message[]) => {
-      setMessages(history);
-    });
-    socket.on("chat-message", (message: Message) => {
-      setMessages((prev) => [...prev, message]);
-    });
+    socket.on("chat-history", (history: Message[]) => setMessages(history));
+    socket.on("chat-message", (message: Message) =>
+      setMessages((prev) => [...prev, message])
+    );
     return () => {
       socket.off("chat-history");
       socket.off("chat-message");
@@ -43,7 +46,10 @@ export default function ChatApp() {
   }, [messages]);
 
   const joinRoom = () => {
-    if (!roomId) return;
+    if (!roomId || !userId) {
+      console.warn("Missing roomId or userId:", { roomId, userId });
+      return;
+    }
     socket.emit("join-room", { roomId, senderId: userId });
   };
 
@@ -52,6 +58,14 @@ export default function ChatApp() {
     socket.emit("chat-message", { roomId, senderId: userId, content: input });
     setInput("");
   };
+
+  if (isLoading || loadingRooms) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-lg">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col bg-background text-foreground">
@@ -62,18 +76,33 @@ export default function ChatApp() {
 
       {/* Controls */}
       <div className="p-4 flex flex-col md:flex-row gap-3 items-center justify-center border-b border-border bg-muted">
-        <input
+        {/* Room Selector */}
+        <select
           className="border px-3 py-2 rounded-md w-full md:w-1/4"
-          placeholder="Room ID"
           value={roomId}
           onChange={(e) => setRoomId(e.target.value)}
-        />
+        >
+          <option value="">Select a chat room</option>
+          {loadingRooms ? (
+            <option disabled>Loading rooms...</option>
+          ) : (
+            roomData?.data?.map((room) => (
+              <option key={room.id} value={room.id}>
+                {room.name}
+              </option>
+            ))
+          )}
+        </select>
+
+        {/* User ID */}
         <input
           className="border px-3 py-2 rounded-md w-full md:w-1/4"
           placeholder="Your User ID"
           value={userId}
           onChange={(e) => setUserId(e.target.value)}
         />
+
+        {/* Join Button */}
         <button
           className="bg-primary text-primary-foreground px-4 py-2 rounded-md"
           onClick={joinRoom}
@@ -117,7 +146,7 @@ export default function ChatApp() {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input */}
+      {/* Input Box */}
       <footer className="p-4 border-t border-border bg-background">
         <div className="flex items-center gap-3">
           <input

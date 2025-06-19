@@ -41,6 +41,7 @@ import {
   HelpCircle,
   Home,
   LogOut,
+  MessageCircle,
   Plus,
   Search,
   Settings,
@@ -137,25 +138,25 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         },
       ],
     },
-    // {
-    //   title: "Management",
-    //   items: [
-    //     {
-    //       title: "Clients",
-    //       icon: Briefcase,
-    //       url: "/clients",
-    //       isActive: pathname === "/clients",
-    //       roles: ["admin", "co-leader"],
-    //     },
-    //     {
-    //       title: "Time Tracking",
-    //       icon: Clock,
-    //       url: "/time-tracking",
-    //       isActive: pathname === "/time-tracking",
-    //       roles: ["admin", "co-leader", "team-member"],
-    //     },
-    //   ],
-    // },
+    {
+      title: "Chat",
+      items: [
+        {
+          title: "Chat",
+          icon: MessageCircle,
+          url: "/chat",
+          isActive: pathname === "/chat",
+          roles: ["admin", "co-leader", "leader", "member"],
+        },
+        {
+          title: "Time Tracking",
+          icon: Clock,
+          url: "/time-tracking",
+          isActive: pathname === "/time-tracking",
+          roles: ["admin", "co-leader", "team-member"],
+        },
+      ],
+    },
   ];
 
   const handleLogout = () => {

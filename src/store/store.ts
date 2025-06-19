@@ -5,6 +5,7 @@ import { projectApi } from "./api/projectApi";
 import { teamApi } from "./api/teamApi";
 import { usersApi } from "./api/usersApi";
 import { profileApi } from "./slices/profileSlice";
+import { chatApi } from "./api/chatApi";
 
 export const store = configureStore({
   reducer: {
@@ -14,6 +15,7 @@ export const store = configureStore({
     [teamApi.reducerPath]: teamApi.reducer,
     [usersApi.reducerPath]: usersApi.reducer,
     [profileApi.reducerPath]: profileApi.reducer,
+    [chatApi.reducerPath]: chatApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -25,7 +27,8 @@ export const store = configureStore({
       projectApi.middleware,
       teamApi.middleware,
       usersApi.middleware,
-      profileApi.middleware
+      profileApi.middleware,
+      chatApi.middleware
     ),
 });
 

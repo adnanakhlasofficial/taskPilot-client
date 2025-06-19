@@ -10,6 +10,8 @@ import { useAuth } from "@/contexts/auth-context";
 
 export default function ProfilePage() {
   const { user } = useAuth();
+  const localUser = JSON.parse(localStorage.getItem("user") || "{}");
+
   const defaultBackgroundImage =
     "https://images.unsplash.com/photo-1557804506-669a67965ba0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80";
   return (
@@ -18,14 +20,19 @@ export default function ProfilePage() {
         <div
           className="relative h-36 md:h-44 bg-cover bg-center"
           style={{
-            backgroundImage: `url('${user?.image || defaultBackgroundImage}')`,
+            backgroundImage: `url('${
+              user?.image || localUser?.image || defaultBackgroundImage
+            }')`,
           }}
         >
           <div className="absolute inset-0" />
           <div className="absolute -bottom-12 left-1/2 transform -translate-x-1/2">
             <Avatar className="h-24 w-24 ring-4 ring-white shadow-md">
               {user?.image ? (
-                <AvatarImage src={user?.image} alt={user?.userName} />
+                <AvatarImage
+                  src={user?.image || localUser.image}
+                  alt={user?.userName || localUser.userName}
+                />
               ) : (
                 <AvatarImage src={defaultBackgroundImage} />
               )}
@@ -47,15 +54,15 @@ export default function ProfilePage() {
           </div>
           <div className="space-y-1">
             <Label>User ID</Label>
-            <Input value={user?.userId} readOnly />
+            <Input value={user?.userId || localUser.userId} readOnly />
           </div>
           <div className="space-y-1">
             <Label>User Name</Label>
-            <Input value={user?.userName} readOnly />
+            <Input value={user?.userName || localUser.userName} readOnly />
           </div>
           <div className="space-y-1">
             <Label>Email</Label>
-            <Input value={user?.email} readOnly />
+            <Input value={user?.email || localUser.email} readOnly />
           </div>
           <div className="absolute top-58 right-6 border-2 rounded-full p-2 bg-white shadow-md hover:bg-gray-100 transition-colors">
             <Link href={`/profile/update`}>
